@@ -27,7 +27,7 @@
     padding:32px 16px 60px;
   }
   .wrap{max-width:880px;margin:0 auto;}
-  header{text-align:center;margin-bottom:32px;}
+  header{text-align:center;margin-bottom:24px;}
   header h1{
     font-size:2.2rem;
     margin:0 0 6px;
@@ -38,6 +38,30 @@
     color:transparent;
   }
   header p{color:var(--text-dim);margin:0;font-size:0.98rem;}
+
+  .tabs{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+  }
+  .tab-btn{
+    background:var(--bg-card-2);
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    padding:11px 22px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:0.92rem;
+    cursor:pointer;
+    transition:border-color .15s, color .15s, background .15s;
+  }
+  .tab-btn:hover{border-color:var(--accent);}
+  .tab-btn.active{border-color:var(--accent);color:var(--accent-2);background:#241a14;}
+
+  .view{display:none;}
+  .view.active{display:block;}
 
   .panel{
     background:var(--bg-card);
@@ -68,6 +92,21 @@
     transition:border-color .15s, color .15s;
   }
   .preset-btn:hover{border-color:var(--accent);color:var(--accent-2);}
+
+  .toggle-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .toggle-btn{
+    background:var(--bg-card-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px 18px;
+    border-radius:20px;
+    font-size:0.88rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:border-color .15s, color .15s, background .15s;
+  }
+  .toggle-btn:hover{border-color:var(--accent);}
+  .toggle-btn.active{border-color:var(--accent);background:#241a14;color:var(--accent-2);}
 
   .equip-grid{
     display:grid;
@@ -123,9 +162,19 @@
   }
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  .workout{display:none;}
+  .workout{display:none;margin-top:24px;}
   .workout.visible{display:block;animation:fadeIn .4s ease;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .cond-summary{
+    text-align:center;
+    color:var(--accent-2);
+    font-size:0.8rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    margin-bottom:16px;
+  }
 
   .block{
     background:var(--bg-card);
@@ -140,6 +189,7 @@
     justify-content:space-between;
     align-items:center;
     border-bottom:1px solid var(--border);
+    gap:12px;
   }
   .block-head h3{margin:0;font-size:1.05rem;}
   .tag{
@@ -149,6 +199,7 @@
     padding:4px 10px;
     border-radius:20px;
     font-weight:700;
+    white-space:nowrap;
   }
   .tag.warmup{background:#1c2b22;color:var(--green);}
   .tag.main{background:#2b2314;color:var(--accent-2);}
@@ -179,6 +230,9 @@
   .ex-list li.completed .ex-name{text-decoration:line-through;}
 
   .block-note{padding:10px 22px;color:var(--text-dim);font-size:0.8rem;background:var(--bg-card-2);}
+  .block-detail{padding:14px 22px;color:var(--text-dim);font-size:0.88rem;line-height:1.5;}
+  .block-target{padding:0 22px 16px;font-size:0.9rem;}
+  .block-target strong{color:var(--accent-2);}
 
   .timer-box{
     display:flex;
@@ -251,83 +305,160 @@
 
   <header>
     <h1>No Lifts, No Claws</h1>
-    <p>Grind hard, claw harder ☕ — 5-min mobility warm-up, 5-exercise full-body strength set, 2-exercise arms/core finisher.</p>
+    <p>Grind hard, claw harder ☕ — strength days and conditioning sessions, built from your actual training structure.</p>
   </header>
 
-  <div class="panel">
-    <h2>⚙️ Your Equipment</h2>
-    <p class="sub">Pick a preset or check individual items — we'll remember your setup for next time.</p>
-    <div class="preset-row">
-      <button class="preset-btn" data-preset="full">Full Gym</button>
-      <button class="preset-btn" data-preset="bodyweight">Just Bodyweight</button>
-      <button class="preset-btn" data-preset="hotel">Hotel Room</button>
-    </div>
-    <div class="equip-grid" id="equipGrid"></div>
+  <div class="tabs" id="mainTabs">
+    <button class="tab-btn active" data-view="strength">Strength Generator</button>
+    <button class="tab-btn" data-view="conditioning">Conditioning Generator</button>
   </div>
 
-  <button class="generate-btn" id="generateBtn">Brew My Workout ☕</button>
+  <!-- ============================================================
+       STRENGTH GENERATOR VIEW (unchanged from previous version)
+  ============================================================= -->
+  <div class="view active" id="strengthView">
 
-  <div class="workout" id="workout">
-
-    <div class="block">
-      <div class="block-head">
-        <h3>Warm-Up</h3>
-        <span class="tag warmup">~5 min</span>
+    <div class="panel">
+      <h2>⚙️ Your Equipment</h2>
+      <p class="sub">Pick a preset or check individual items — we'll remember your setup for next time.</p>
+      <div class="preset-row">
+        <button class="preset-btn" data-preset="full">Full Gym</button>
+        <button class="preset-btn" data-preset="bodyweight">Just Bodyweight</button>
+        <button class="preset-btn" data-preset="hotel">Hotel Room</button>
       </div>
-      <ul class="ex-list" id="warmupList"></ul>
-      <div class="timer-box" id="warmupTimer" data-duration="300">
-        <span class="timer-label">Warm-up timer</span>
-        <span class="timer-display">5:00</span>
-        <div class="timer-controls">
-          <button class="timer-btn" data-action="start">Start</button>
-          <button class="timer-btn" data-action="pause">Pause</button>
-          <button class="timer-btn" data-action="reset">Reset</button>
+      <div class="equip-grid" id="equipGrid"></div>
+    </div>
+
+    <button class="generate-btn" id="generateBtn">Brew My Workout ☕</button>
+
+    <div class="workout" id="workout">
+
+      <div class="block">
+        <div class="block-head">
+          <h3>Warm-Up</h3>
+          <span class="tag warmup">~5 min</span>
+        </div>
+        <ul class="ex-list" id="warmupList"></ul>
+        <div class="timer-box" id="warmupTimer" data-duration="300">
+          <span class="timer-label">Warm-up timer</span>
+          <span class="timer-display">5:00</span>
+          <div class="timer-controls">
+            <button class="timer-btn" data-action="start">Start</button>
+            <button class="timer-btn" data-action="pause">Pause</button>
+            <button class="timer-btn" data-action="reset">Reset</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="block">
-      <div class="block-head">
-        <h3>Main Set — Full Body</h3>
-        <span class="tag main" id="mainRoundsTag">3 Rounds</span>
-      </div>
-      <ul class="ex-list" id="mainList"></ul>
-      <div class="block-note">Complete all 5 exercises back-to-back, then rest. Repeat for the full number of rounds shown above.</div>
-      <div class="timer-box compact" id="restTimer" data-duration="90">
-        <span class="timer-label">Rest between rounds</span>
-        <span class="timer-display">1:30</span>
-        <div class="timer-controls">
-          <button class="timer-btn" data-action="start">Start Rest</button>
-          <button class="timer-btn" data-action="pause">Pause</button>
-          <button class="timer-btn" data-action="reset">Reset</button>
+      <div class="block">
+        <div class="block-head">
+          <h3>Main Set — Full Body</h3>
+          <span class="tag main" id="mainRoundsTag">3 Rounds</span>
+        </div>
+        <ul class="ex-list" id="mainList"></ul>
+        <div class="block-note">Complete all 5 exercises back-to-back, then rest. Repeat for the full number of rounds shown above.</div>
+        <div class="timer-box compact" id="restTimer" data-duration="90">
+          <span class="timer-label">Rest between rounds</span>
+          <span class="timer-display">1:30</span>
+          <div class="timer-controls">
+            <button class="timer-btn" data-action="start">Start Rest</button>
+            <button class="timer-btn" data-action="pause">Pause</button>
+            <button class="timer-btn" data-action="reset">Reset</button>
+          </div>
         </div>
       </div>
+
+      <div class="block">
+        <div class="block-head">
+          <h3 id="finisherTitle">Finisher</h3>
+          <span class="tag finisher" id="finisherRoundsTag">3 Rounds</span>
+        </div>
+        <ul class="ex-list" id="finisherList"></ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CONDITIONING GENERATOR VIEW (new)
+  ============================================================= -->
+  <div class="view" id="conditioningView">
+
+    <div class="panel">
+      <h2>📍 Location</h2>
+      <p class="sub">Grass Pitch assembles a 5-stage session; Road Loop builds a single loop protocol.</p>
+      <div class="toggle-row" id="locationToggle">
+        <button class="toggle-btn active" data-value="grass">Grass Pitch</button>
+        <button class="toggle-btn" data-value="road">Road Loop</button>
+      </div>
     </div>
 
-    <div class="block">
-      <div class="block-head">
-        <h3 id="finisherTitle">Finisher</h3>
-        <span class="tag finisher" id="finisherRoundsTag">3 Rounds</span>
+    <div class="panel">
+      <h2>⏱️ Volume / Duration</h2>
+      <div class="toggle-row" id="volumeToggle">
+        <button class="toggle-btn" data-value="express">Express (~20 min)</button>
+        <button class="toggle-btn active" data-value="standard">Standard (~30-35 min)</button>
+        <button class="toggle-btn" data-value="heavy">Heavy (~45 min)</button>
       </div>
-      <ul class="ex-list" id="finisherList"></ul>
     </div>
+
+    <div class="panel">
+      <h2>🎯 Focus</h2>
+      <div class="toggle-row" id="focusToggle">
+        <button class="toggle-btn active" data-value="balanced">Balanced</button>
+        <button class="toggle-btn" data-value="agility">Agility &amp; Speed</button>
+        <button class="toggle-btn" data-value="aerobic">Aerobic &amp; Capacity</button>
+      </div>
+    </div>
+
+    <button class="generate-btn" id="conditioningGenerateBtn">Generate Workout 🏃</button>
+
+    <div class="workout" id="conditioningWorkout"></div>
 
   </div>
 
   <footer>
     <p class="footer-signoff">Workout's brewed. Now go get after it.</p>
-    <strong>Safety Disclaimer:</strong> This tool generates workout suggestions for informational purposes only and is not a substitute for professional medical or fitness advice. Consult a physician before beginning any new exercise program, especially if you have pre-existing injuries or health conditions. Use proper form at all times, choose weights appropriate to your ability, and stop immediately if you feel pain, dizziness, or shortness of breath. You are responsible for your own safety while performing any workout generated by this app.
+    <strong>Safety Disclaimer:</strong> This tool generates workout suggestions for informational purposes only and is not a substitute for professional medical or fitness advice. Consult a physician before beginning any new exercise program, especially if you have pre-existing injuries or health conditions. Use proper form at all times, choose weights and paces appropriate to your ability, and stop immediately if you feel pain, dizziness, or shortness of breath. You are responsible for your own safety while performing any workout generated by this app.
   </footer>
 
 </div>
 
 <script>
-/* =========================================================
-   EXERCISE DATABASE
-   Extracted & categorized from the user's S&C class whiteboards.
-   Every category guarantees at least one bodyweight-only option
-   so the generator never comes up empty.
-========================================================= */
+/* =========================================================================
+   SHARED TAB NAVIGATION
+   Strength Generator and Conditioning Generator are independent views;
+   neither reads nor writes the other's state.
+========================================================================= */
+
+const TAB_STORAGE_KEY = 'noLiftsNoClaws.activeTab';
+
+function setActiveTab(tab) {
+  document.querySelectorAll('#mainTabs .tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === tab);
+  });
+  document.getElementById('strengthView').classList.toggle('active', tab === 'strength');
+  document.getElementById('conditioningView').classList.toggle('active', tab === 'conditioning');
+  try { localStorage.setItem(TAB_STORAGE_KEY, tab); } catch (e) { /* ignore */ }
+}
+
+document.querySelectorAll('#mainTabs .tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => setActiveTab(btn.dataset.view));
+});
+
+(function restoreTab() {
+  let saved = 'strength';
+  try { saved = localStorage.getItem(TAB_STORAGE_KEY) || 'strength'; } catch (e) { /* ignore */ }
+  setActiveTab(saved);
+})();
+
+
+/* =========================================================================
+   ==========================  STRENGTH GENERATOR  ==========================
+   Everything in this section is unchanged from the previous version of
+   the app — the Conditioning Generator below is fully independent and
+   does not read or modify any of this.
+========================================================================= */
 
 const EQUIPMENT = [
   { id:'bodyweight', label:'Bodyweight',            always:true },
@@ -439,10 +570,6 @@ const FINISHER = {
   ]
 };
 
-/* =========================================================
-   EQUIPMENT PANEL — presets + persistence (localStorage)
-========================================================= */
-
 const STORAGE_KEY = 'noLiftsNoClaws.equipment.v1';
 const OPTIONAL_IDS = EQUIPMENT.filter(e => !e.always).map(e => e.id);
 
@@ -504,7 +631,7 @@ EQUIPMENT.forEach(item => {
   equipGrid.appendChild(row);
 });
 
-document.querySelectorAll('.preset-btn').forEach(btn => {
+document.querySelectorAll('#strengthView .preset-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const presetIds = new Set(PRESETS[btn.dataset.preset] || []);
     OPTIONAL_IDS.forEach(id => {
@@ -525,10 +652,6 @@ function getCheckedEquipment() {
   });
   return set;
 }
-
-/* =========================================================
-   GENERATOR LOGIC
-========================================================= */
 
 function filterPool(pool, checkedSet) {
   return pool.filter(ex => ex.equip.every(id => checkedSet.has(id)));
@@ -598,10 +721,6 @@ function renderList(el, exercises) {
   });
 }
 
-/* =========================================================
-   TIMERS — warm-up countdown + between-round rest timer
-========================================================= */
-
 function formatTime(totalSeconds) {
   const m = Math.floor(totalSeconds / 60);
   const s = totalSeconds % 60;
@@ -666,10 +785,6 @@ function initTimer(containerId) {
 const warmupTimer = initTimer('warmupTimer');
 const restTimer = initTimer('restTimer');
 
-/* =========================================================
-   GENERATE BUTTON — loading state + workout build
-========================================================= */
-
 const generateBtn = document.getElementById('generateBtn');
 let hasGeneratedOnce = false;
 let lastWorkoutNames = new Set();
@@ -682,19 +797,16 @@ generateBtn.addEventListener('click', () => {
     const checkedSet = getCheckedEquipment();
     const usedNames = new Set();
 
-    // Warm-up: 5 unique bodyweight (+foam if checked) mobility moves, ~5 minutes
     const warmupPicks = pickMany(WARMUP, checkedSet, 5, lastWorkoutNames);
     warmupPicks.forEach(ex => usedNames.add(ex.name));
     renderList(document.getElementById('warmupList'), warmupPicks);
 
-    // Main Set: one exercise per movement slot = 5 exercise full-body circuit
     const slots = ['hinge','squat','push','pull','core'];
     const mainPicks = slots.map(slot => pickOne(MAIN_SET[slot], checkedSet, lastWorkoutNames));
     mainPicks.forEach(ex => usedNames.add(ex.name));
     renderList(document.getElementById('mainList'), mainPicks);
     document.getElementById('mainRoundsTag').textContent = '3 Rounds';
 
-    // Finisher: randomly focus on Arms or Core, pick 2 exercises
     const focus = Math.random() < 0.5 ? 'arms' : 'core';
     const finisherPicks = pickMany(FINISHER[focus], checkedSet, 2, lastWorkoutNames);
     finisherPicks.forEach(ex => usedNames.add(ex.name));
@@ -716,6 +828,240 @@ generateBtn.addEventListener('click', () => {
     generateBtn.disabled = false;
     generateBtn.textContent = hasGeneratedOnce ? 'Brew Another Round ☕' : 'Brew My Workout ☕';
   }, 700);
+});
+
+
+/* =========================================================================
+   ========================  CONDITIONING GENERATOR  ========================
+   Fully independent from the Strength Generator above — separate data,
+   separate state variables, separate DOM ids. Nothing here touches the
+   Strength code, and nothing in the Strength code touches this.
+========================================================================= */
+
+// --- Data model, extracted from the running-session whiteboard spec ---
+
+const GRASS = {
+  warmup: {
+    name: 'Standard Field Warm-Up',
+    detail: '5 min light jog, dynamic mobility (leg swings, open/close gate, lunges), and plyometrics (pogo jumps, high knees).'
+  },
+  cooldown: {
+    name: 'Field Recovery',
+    detail: '5 min light walk, static hamstring/quad/calf stretching.'
+  },
+  // Block 1 — Agility, CNS & Acceleration
+  short: [
+    { name:'4-Cone Shuttle', detail:'4 cones 5m apart. Shuttle out, backpedal back, stride to halfway line.',
+      base:{ value:8, unit:'reps' }, weight:{ balanced:2, agility:3, aerobic:1 } },
+    { name:'100m Drop-Off Cutoff Test', detail:'100m shuttle (2x50m) in under 20s, 10s rest. Perform AMAP until you miss the cap.',
+      base:{ amap:true }, weight:{ balanced:1, agility:3, aerobic:1 } },
+    { name:'80m Micro-Intervals', detail:'50m out + 30m turn/backpedal, in 15s. 15s rest.',
+      base:{ sets:2, reps:8, unit:'reps' }, weight:{ balanced:2, agility:2, aerobic:1 } },
+    { name:'5-10-15m Acceleration Ladder', detail:'Sprint 5m (walk back), sprint 10m (walk back), sprint 15m (walk back) = 1 round.',
+      base:{ value:6, unit:'rounds' }, weight:{ balanced:2, agility:3, aerobic:1 } }
+  ],
+  // Block 2 — Speed Endurance & Strides
+  mid: [
+    { name:'Box-to-Box Strides', detail:'50-60m strides at 80% effort, with a jog build-up and decel zone.',
+      base:{ value:8, unit:'reps' }, weight:{ balanced:3, agility:2, aerobic:2 } },
+    { name:'400m Pitch Shuttles', detail:'8 lengths of the 50m pitch. 90s rest.',
+      base:{ value:4, unit:'reps' }, weight:{ balanced:2, agility:1, aerobic:3 } },
+    { name:'200m Pitch Shuttles', detail:'4 lengths of the 50m pitch. 30s rest between reps, 2-3 min rest between sets.',
+      base:{ sets:2, reps:4, unit:'reps' }, weight:{ balanced:2, agility:1, aerobic:2 } },
+    { name:'Diagonal Pitch Strides', detail:'Sprint the pitch diagonally (~60m), easy jog back along the short end-line.',
+      base:{ value:8, unit:'reps' }, weight:{ balanced:2, agility:2, aerobic:1 } }
+  ],
+  // Block 3 — Aerobic Capacity & Volume
+  long: [
+    { name:'Pitch Corner Ladder', detail:'Continuous loop: jog the short side, sprint the long side, building 1, 2, 3, then all 4 sides = 1 full lap.',
+      base:{ value:2, unit:'sets' }, weight:{ balanced:2, agility:1, aerobic:3 } },
+    { name:'600m Pitch Shuttles', detail:'12 lengths of the 50m pitch. 2 min rest.',
+      base:{ value:2, unit:'reps' }, weight:{ balanced:2, agility:1, aerobic:3 } },
+    { name:'Full Pitch Sprint/Walk Loops', detail:'Sprint the 100m long sides, walk/jog the 50m short sides.',
+      base:{ value:4, unit:'continuous laps' }, weight:{ balanced:1, agility:1, aerobic:3 } }
+  ]
+};
+
+// Road protocols are mapped 1:1 to Focus — chosen by intensity character
+// (Fartlek Surges = blended tempo -> Balanced; Landmark Surges = explosive
+// bursts -> Agility & Speed; Threshold Lap Reps = sustained tempo -> Aerobic).
+const ROAD_PROTOCOLS = {
+  balanced: { name:'Fartlek Surges', style:'continuous',
+    detail:'Run 2 minutes at 80% pace, then 1 minute of light recovery jogging — continuously for the full distance.' },
+  agility: { name:'Landmark/Straightaway Surges', style:'continuous',
+    detail:'Hard push on every straightaway, easy jog through all corners and inclines.' },
+  aerobic: { name:'Threshold Lap Reps', style:'reps',
+    detail:'Sustained fast tempo for each loop, with 3-4 minutes of static rest between loops.' }
+};
+
+const ROAD_LOOP_KM = 1.15; // midpoint of the 1.1km-1.2km standard loop
+
+const VOLUME = {
+  express:  { label:'Express',  timeLabel:'~20 min',    mult:0.7,  roadLaps:1, amapMin:5 },
+  standard: { label:'Standard', timeLabel:'~30-35 min', mult:1.0,  roadLaps:2, amapMin:8 },
+  heavy:    { label:'Heavy',    timeLabel:'~45 min',    mult:1.28, roadLaps:3, amapMin:12 }
+};
+
+const FOCUS_LABELS = { balanced:'Balanced', agility:'Agility & Speed', aerobic:'Aerobic & Capacity' };
+
+// --- Generic toggle-button group (Location / Volume / Focus) ---
+
+function setupToggleGroup(containerId, defaultValue) {
+  const container = document.getElementById(containerId);
+  let selected = defaultValue;
+  container.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selected = btn.dataset.value;
+    });
+  });
+  return { get: () => selected };
+}
+
+const locationGroup = setupToggleGroup('locationToggle', 'grass');
+const volumeGroup = setupToggleGroup('volumeToggle', 'standard');
+const focusGroup = setupToggleGroup('focusToggle', 'balanced');
+
+// --- Selection + scaling logic ---
+
+// Weighted random pick biased toward the chosen Focus. Falls back to the
+// full pool if excluding the previous pick would leave nothing to choose.
+function weightedPick(pool, focus, excludeNames) {
+  let candidates = pool.filter(ex => !excludeNames.has(ex.name));
+  if (candidates.length === 0) candidates = pool;
+  const weighted = [];
+  candidates.forEach(ex => {
+    const w = (ex.weight && ex.weight[focus]) || 1;
+    for (let i = 0; i < w; i++) weighted.push(ex);
+  });
+  return weighted[Math.floor(Math.random() * weighted.length)];
+}
+
+// Express: ~30% reduction. Standard: baseline. Heavy: ~28% increase, or
+// an extra set for sets x reps exercises (per the spec's "or add a set").
+function scaleGrassExercise(ex, volumeKey) {
+  const v = VOLUME[volumeKey];
+  const base = ex.base;
+
+  if (base.amap) {
+    return `AMAP for ~${v.amapMin} min — stop once you miss the 20s cap`;
+  }
+  if (base.sets) {
+    let sets = base.sets;
+    let reps = base.reps;
+    if (volumeKey === 'heavy') sets += 1;
+    else reps = Math.max(1, Math.round(reps * v.mult));
+    return `${sets} sets x ${reps} ${base.unit}`;
+  }
+  const value = Math.max(1, Math.round(base.value * v.mult));
+  return `${value} ${base.unit}`;
+}
+
+function generateGrassWorkout(focus, volumeKey, excludeNames) {
+  const shortEx = weightedPick(GRASS.short, focus, excludeNames);
+  const midEx = weightedPick(GRASS.mid, focus, excludeNames);
+  const longEx = weightedPick(GRASS.long, focus, excludeNames);
+
+  const stages = [
+    { tag:'Warm-Up', tagClass:'warmup', title:GRASS.warmup.name, detail:GRASS.warmup.detail, target:'5 min' },
+    { tag:'Block 1 — Short', tagClass:'main', title:shortEx.name, detail:shortEx.detail, target:scaleGrassExercise(shortEx, volumeKey) },
+    { tag:'Block 2 — Mid', tagClass:'main', title:midEx.name, detail:midEx.detail, target:scaleGrassExercise(midEx, volumeKey) },
+    { tag:'Block 3 — Long', tagClass:'main', title:longEx.name, detail:longEx.detail, target:scaleGrassExercise(longEx, volumeKey) },
+    { tag:'Cool-Down', tagClass:'warmup', title:GRASS.cooldown.name, detail:GRASS.cooldown.detail, target:'5 min' }
+  ];
+
+  return { stages, usedNames: new Set([shortEx.name, midEx.name, longEx.name]), summaryExtra:null };
+}
+
+function generateRoadWorkout(focus, volumeKey) {
+  const protocol = ROAD_PROTOCOLS[focus];
+  const v = VOLUME[volumeKey];
+  const workLaps = v.roadLaps;
+  const totalLaps = workLaps + 1; // + 0.5 warm-up + 0.5 cool-down = 1 full loop
+  const totalDistanceKm = (totalLaps * ROAD_LOOP_KM).toFixed(1);
+
+  const target = protocol.style === 'reps'
+    ? `${workLaps} x 1.1-1.2km loop${workLaps > 1 ? 's' : ''} at threshold tempo, 3-4 min static rest between`
+    : `${workLaps} continuous loop${workLaps > 1 ? 's' : ''} (~${(workLaps * ROAD_LOOP_KM).toFixed(1)}km) using the surge pattern above`;
+
+  const stages = [
+    { tag:'Warm-Up', tagClass:'warmup', title:'Easy Lap', detail:'0.5 lap easy jog to open up.', target:'0.5 lap' },
+    { tag:'Main Protocol', tagClass:'main', title:protocol.name, detail:protocol.detail, target },
+    { tag:'Cool-Down', tagClass:'warmup', title:'Easy Lap', detail:'0.5 lap easy jog / walk to bring the heart rate down.', target:'0.5 lap' }
+  ];
+
+  return { stages, usedNames: new Set([protocol.name]), summaryExtra:`~${totalDistanceKm}km total incl. warm-up/cool-down` };
+}
+
+// --- Rendering ---
+
+function renderConditioningWorkout(result, summaryLine) {
+  const container = document.getElementById('conditioningWorkout');
+  container.innerHTML = '';
+
+  const summary = document.createElement('div');
+  summary.className = 'cond-summary';
+  summary.textContent = summaryLine;
+  container.appendChild(summary);
+
+  result.stages.forEach(stage => {
+    const block = document.createElement('div');
+    block.className = 'block';
+    block.innerHTML = `
+      <div class="block-head">
+        <h3>${stage.title}</h3>
+        <span class="tag ${stage.tagClass}">${stage.tag}</span>
+      </div>
+      <div class="block-detail">${stage.detail}</div>
+      <div class="block-target"><strong>Target:</strong> ${stage.target}</div>
+    `;
+    container.appendChild(block);
+  });
+
+  container.classList.add('visible');
+}
+
+// --- Generate / Regenerate button (relabels itself after first use,
+//     same pattern as the Strength Generator's Brew button) ---
+
+const conditioningBtn = document.getElementById('conditioningGenerateBtn');
+let hasGeneratedConditioningOnce = false;
+let lastConditioningNames = new Set();
+
+conditioningBtn.addEventListener('click', () => {
+  conditioningBtn.disabled = true;
+  conditioningBtn.innerHTML = '<span class="spinner"></span>Plotting your session...';
+
+  setTimeout(() => {
+    const location = locationGroup.get();
+    const volumeKey = volumeGroup.get();
+    const focus = focusGroup.get();
+    const v = VOLUME[volumeKey];
+
+    let result;
+    let extraLine = '';
+
+    if (location === 'grass') {
+      result = generateGrassWorkout(focus, volumeKey, lastConditioningNames);
+    } else {
+      result = generateRoadWorkout(focus, volumeKey);
+      extraLine = ' • ' + result.summaryExtra;
+    }
+    lastConditioningNames = result.usedNames;
+
+    const locationLabel = location === 'grass' ? 'Grass Pitch' : 'Road Loop';
+    const summaryLine = `${locationLabel} • ${v.label} • ${FOCUS_LABELS[focus]} • ${v.timeLabel}${extraLine}`;
+
+    renderConditioningWorkout(result, summaryLine);
+
+    const workoutEl = document.getElementById('conditioningWorkout');
+    workoutEl.scrollIntoView({ behavior:'smooth', block:'start' });
+
+    hasGeneratedConditioningOnce = true;
+    conditioningBtn.disabled = false;
+    conditioningBtn.textContent = hasGeneratedConditioningOnce ? 'Regenerate 🔁' : 'Generate Workout 🏃';
+  }, 600);
 });
 </script>
 </body>
