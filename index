@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>No Lifts, No Claws</title>
+<style>
+  :root{
+    --bg:#0e0f11;
+    --bg-card:#17191c;
+    --bg-card-2:#1e2124;
+    --border:#2a2d31;
+    --text:#f1f2f4;
+    --text-dim:#9aa0a6;
+    --accent:#ff5a1f;
+    --accent-2:#ffb020;
+    --green:#3ddc84;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    background:radial-gradient(circle at top left,#1a1c1f,#0e0f11 60%);
+    color:var(--text);
+    min-height:100vh;
+    padding:32px 16px 60px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+  header{text-align:center;margin-bottom:24px;}
+  header h1{
+    font-size:2.2rem;
+    margin:0 0 6px;
+    letter-spacing:-0.5px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  header p{color:var(--text-dim);margin:0;font-size:0.98rem;}
+
+  .tabs{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+  }
+  .tab-btn{
+    background:var(--bg-card-2);
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    padding:11px 22px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:0.92rem;
+    cursor:pointer;
+    transition:border-color .15s, color .15s, background .15s;
+  }
+  .tab-btn:hover{border-color:var(--accent);}
+  .tab-btn.active{border-color:var(--accent);color:var(--accent-2);background:#241a14;}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .panel{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    margin-bottom:24px;
+  }
+  .panel h2{
+    margin:0 0 4px;
+    font-size:1.1rem;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .panel .sub{color:var(--text-dim);font-size:0.85rem;margin:0 0 16px;}
+
+  .preset-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .preset-btn{
+    background:var(--bg-card-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:8px 16px;
+    border-radius:20px;
+    font-size:0.82rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:border-color .15s, color .15s;
+  }
+  .preset-btn:hover{border-color:var(--accent);color:var(--accent-2);}
+
+  .toggle-row{display:flex;gap:10px;flex-wrap:wrap;}
+  .toggle-btn{
+    background:var(--bg-card-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px 18px;
+    border-radius:20px;
+    font-size:0.88rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:border-color .15s, color .15s, background .15s;
+  }
+  .toggle-btn:hover{border-color:var(--accent);}
+  .toggle-btn.active{border-color:var(--accent);background:#241a14;color:var(--accent-2);}
+
+  .equip-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:10px;
+  }
+  .equip-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--bg-card-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 12px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+    user-select:none;
+  }
+  .equip-item:hover{border-color:var(--accent);}
+  .equip-item.checked{border-color:var(--accent);background:#241a14;}
+  .equip-item input{accent-color:var(--accent);width:16px;height:16px;cursor:pointer;}
+  .equip-item.disabled{opacity:0.6;cursor:not-allowed;}
+  .equip-item label{font-size:0.9rem;cursor:pointer;flex:1;}
+
+  .generate-btn{
+    display:block;
+    width:100%;
+    padding:16px;
+    font-size:1.05rem;
+    font-weight:700;
+    letter-spacing:0.3px;
+    color:#111;
+    background:linear-gradient(90deg,var(--accent-2),var(--accent));
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    transition:transform .12s, box-shadow .12s, opacity .15s;
+    box-shadow:0 8px 24px rgba(255,90,31,0.25);
+  }
+  .generate-btn:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(255,90,31,0.35);}
+  .generate-btn:active{transform:translateY(0);}
+  .generate-btn:disabled{cursor:wait;opacity:0.88;}
+
+  .spinner{
+    display:inline-block;
+    width:14px;height:14px;
+    border:2px solid rgba(0,0,0,0.25);
+    border-top-color:#111;
+    border-radius:50%;
+    animation:spin 0.6s linear infinite;
+    margin-right:8px;
+    vertical-align:middle;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .workout{display:none;margin-top:24px;}
+  .workout.visible{display:block;animation:fadeIn .4s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .cond-summary{
+    text-align:center;
+    color:var(--accent-2);
+    font-size:0.8rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    margin-bottom:16px;
+  }
+
+  .block{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    margin-bottom:18px;
+    overflow:hidden;
+  }
+  .block-head{
+    padding:16px 22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid var(--border);
+    gap:12px;
+  }
+  .block-head h3{margin:0;font-size:1.05rem;}
+  .tag{
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    padding:4px 10px;
+    border-radius:20px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .tag.warmup{background:#1c2b22;color:var(--green);}
+  .tag.main{background:#2b2314;color:var(--accent-2);}
+  .tag.finisher{background:#2a1a25;color:#ff6ec7;}
+
+  .ex-list{list-style:none;margin:0;padding:0;}
+  .ex-list li{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 22px;
+    border-bottom:1px solid var(--border);
+    font-size:0.95rem;
+    transition:opacity .15s;
+  }
+  .ex-list li:last-child{border-bottom:none;}
+  .ex-check{width:18px;height:18px;accent-color:var(--green);cursor:pointer;flex-shrink:0;}
+  .ex-main{flex:1;min-width:0;}
+  .ex-name{font-weight:600;}
+  .ex-equip{display:block;color:var(--text-dim);font-size:0.78rem;margin-top:2px;font-weight:400;}
+  .ex-reps{
+    color:var(--accent-2);
+    font-weight:700;
+    white-space:nowrap;
+    font-size:0.9rem;
+  }
+  .ex-list li.completed{opacity:0.5;}
+  .ex-list li.completed .ex-name{text-decoration:line-through;}
+
+  .block-note{padding:10px 22px;color:var(--text-dim);font-size:0.8rem;background:var(--bg-card-2);}
+  .block-detail{padding:14px 22px;color:var(--text-dim);font-size:0.88rem;line-height:1.5;}
+  .block-target{padding:0 22px 16px;font-size:0.9rem;}
+  .block-target strong{color:var(--accent-2);}
+
+  .timer-box{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 22px;
+    background:var(--bg-card-2);
+    border-top:1px solid var(--border);
+    flex-wrap:wrap;
+  }
+  .timer-box.compact{padding:12px 22px;}
+  .timer-label{color:var(--text-dim);font-size:0.78rem;margin-right:auto;}
+  .timer-display{
+    font-family:'Courier New', monospace;
+    font-size:1.6rem;
+    font-weight:700;
+    letter-spacing:1px;
+    color:var(--accent-2);
+    min-width:66px;
+  }
+  .timer-box.compact .timer-display{font-size:1.3rem;min-width:56px;}
+  .timer-box.flash .timer-display{color:var(--green);animation:pulse 0.6s ease 2;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.25;}}
+  .timer-controls{display:flex;gap:8px;}
+  .timer-btn{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:0.82rem;
+    cursor:pointer;
+    transition:border-color .15s;
+  }
+  .timer-btn:hover{border-color:var(--accent);}
+
+  .empty-msg{
+    text-align:center;
+    color:var(--text-dim);
+    padding:14px;
+    font-size:0.9rem;
+  }
+
+  footer{margin-top:36px;padding:18px 20px;border-radius:var(--radius);background:var(--bg-card-2);border:1px solid var(--border);color:var(--text-dim);font-size:0.78rem;line-height:1.5;}
+  footer strong{color:var(--text);}
+  .footer-signoff{color:var(--accent-2);font-weight:700;font-size:0.92rem;margin:0 0 12px;}
+
+  @media (max-width:520px){
+    header h1{font-size:1.7rem;}
+    .panel{padding:18px;}
+    .ex-list li{padding:12px 16px;}
+    .block-head{padding:14px 16px;}
+    .timer-box{padding:12px 16px;}
+  }
+
+  @media (max-width:640px){
+    body{padding-bottom:110px;}
+    .generate-btn{
+      position:fixed;
+      left:16px;
+      right:16px;
+      bottom:16px;
+      z-index:50;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>No Lifts, No Claws</h1>
+    <p>Grind hard, claw harder ☕ — strength days and conditioning sessions, built from your actual training structure.</p>
+  </header>
+
+  <div class="tabs" id="mainTabs">
+    <button class="tab-btn active" data-view="strength">Strength Generator</button>
+    <button class="tab-btn" data-view="conditioning">Conditioning Generator</button>
+  </div>
+
+  <!-- ============================================================
+       STRENGTH GENERATOR VIEW (unchanged from previous version)
+  ============================================================= -->
+  <div class="view active" id="strengthView">
+
+    <div class="panel">
+      <h2>⚙️ Your Equipment</h2>
+      <p class="sub">Pick a preset or check individual items — we'll remember your setup for next time.</p>
+      <div class="preset-row">
+        <button class="preset-btn" data-preset="full">Full Gym</button>
+        <button class="preset-btn" data-preset="bodyweight">Just Bodyweight</button>
+        <button class="preset-btn" data-preset="hotel">Hotel Room</button>
+      </div>
+      <div class="equip-grid" id="equipGrid"></div>
+    </div>
+
+    <button class="generate-btn" id="generateBtn">Brew My Workout ☕</button>
+
+    <div class="workout" id="workout">
+
+      <div class="block">
+        <div class="block-head">
+          <h3>Warm-Up</h3>
+          <span class="tag warmup">~5 min</span>
+        </div>
+        <ul class="ex-list" id="warmupList"></ul>
+        <div class="timer-box" id="warmupTimer" data-duration="300">
+          <span class="timer-label">Warm-up timer</span>
+          <span class="timer-display">5:00</span>
+          <div class="timer-controls">
+            <button class="timer-btn" data-action="start">Start</button>
+            <button class="timer-btn" data-action="pause">Pause</button>
+            <button class="timer-btn" data-action="reset">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="block-head">
+          <h3>Main Set — Full Body</h3>
+          <span class="tag main" id="mainRoundsTag">3 Rounds</span>
+        </div>
+        <ul class="ex-list" id="mainList"></ul>
+        <div class="block-note">Complete all 5 exercises back-to-back, then rest. Repeat for the full number of rounds shown above.</div>
+        <div class="timer-box compact" id="restTimer" data-duration="90">
+          <span class="timer-label">Rest between rounds</span>
+          <span class="timer-display">1:30</span>
+          <div class="timer-controls">
+            <button class="timer-btn" data-action="start">Start Rest</button>
+            <button class="timer-btn" data-action="pause">Pause</button>
+            <button class="timer-btn" data-action="reset">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="block-head">
+          <h3 id="finisherTitle">Finisher</h3>
+          <span class="tag finisher" id="finisherRoundsTag">3 Rounds</span>
+        </div>
+        <ul class="ex-list" id="finisherList"></ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CONDITIONING GENERATOR VIEW (new)
+  ============================================================= -->
+  <div class="view" id="conditioningView">
+
+    <div class="panel">
+      <h2>📍 Location</h2>
+      <p class="sub">Grass Pitch assembles a 5-stage session; Road Loop builds a single loop protocol.</p>
+      <div class="toggle-row" id="locationToggle">
+        <button class="toggle-btn active" data-value="grass">Grass Pitch</button>
+        <button class="toggle-btn" data-value="road">Road Loop</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>⏱️ Volume / Duration</h2>
+      <div class="toggle-row" id="volumeToggle">
+        <button class="toggle-btn" data-value="express">Express (~20 min)</button>
+        <button class="toggle-btn active" data-value="standard">Standard (~30-35 min)</button>
+        <button class="toggle-btn" data-value="heavy">Heavy (~45 min)</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🎯 Focus</h2>
+      <div class="toggle-row" id="focusToggle">
+        <button class="toggle-btn active" data-value="balanced">Balanced</button>
+        <button class="toggle-btn" data-value="agility">Agility &amp; Speed</button>
+        <button class="toggle-btn" data-value="aerobic">Aerobic &amp; Capacity</button>
+      </div>
+    </div>
+
+    <button class="generate-btn" id="conditioningGenerateBtn">Generate Workout 🏃</button>
+
+    <div class="workout" id="conditioningWorkout"></div>
+
+  </div>
+
+  <footer>
+    <p class="footer-signoff">Workout's brewed. Now go get after it.</p>
+    <strong>Safety Disclaimer:</strong> This tool generates workout suggestions for informational purposes only and is not a substitute for professional medical or fitness advice. Consult a physician before beginning any new exercise program, especially if you have pre-existing injuries or health conditions. Use proper form at all times, choose weights and paces appropriate to your ability, and stop immediately if you feel pain, dizziness, or shortness of breath. You are responsible for your own safety while performing any workout generated by this app.
+  </footer>
+
+</div>
+
+<script>
+/* =========================================================================
+   SHARED TAB NAVIGATION
+   Strength Generator and Conditioning Generator are independent views;
+   neither reads nor writes the other's state.
+========================================================================= */
+
+const TAB_STORAGE_KEY = 'noLiftsNoClaws.activeTab';
+
+function setActiveTab(tab) {
+  document.querySelectorAll('#mainTabs .tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === tab);
+  });
+  document.getElementById('strengthView').classList.toggle('active', tab === 'strength');
+  document.getElementById('conditioningView').classList.toggle('active', tab === 'conditioning');
+  try { localStorage.setItem(TAB_STORAGE_KEY, tab); } catch (e) { /* ignore */ }
+}
+
+document.querySelectorAll('#mainTabs .tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => setActiveTab(btn.dataset.view));
+});
+
+(function restoreTab() {
+  let saved = 'strength';
+  try { saved = localStorage.getItem(TAB_STORAGE_KEY) || 'strength'; } catch (e) { /* ignore */ }
+  setActiveTab(saved);
+})();
+
+
+/* =========================================================================
+   ==========================  STRENGTH GENERATOR  ==========================
+   Everything in this section is unchanged from the previous version of
+   the app — the Conditioning Generator below is fully independent and
+   does not read or modify any of this.
+========================================================================= */
+
+const EQUIPMENT = [
+  { id:'bodyweight', label:'Bodyweight',            always:true },
+  { id:'kb',         label:'Kettlebells',           pre:true },
+  { id:'db',         label:'Dumbbells',             pre:true },
+  { id:'bench',      label:'Bench',                 pre:true },
+  { id:'medball',    label:'Medicine Ball',         pre:true },
+  { id:'pullup',     label:'Pull-Up Bar',           pre:true },
+  { id:'barbell',    label:'Barbell',                pre:false },
+  { id:'trapbar',    label:'Trap Bar',               pre:false },
+  { id:'trx',        label:'TRX / Suspension Trainer', pre:false },
+  { id:'cable',      label:'Cable Machine',          pre:false },
+  { id:'landmine',   label:'Landmine Attachment',    pre:false },
+  { id:'bands',      label:'Resistance Bands',       pre:false },
+  { id:'foam',       label:'Foam Roller',            pre:false }
+];
+
+const WARMUP = [
+  { name:'World\'s Greatest Stretch',        reps:'5 each side',        equip:['bodyweight'] },
+  { name:'90/90 Hip Switch',                 reps:'8 each side',        equip:['bodyweight'] },
+  { name:'Cat–Cow',                          reps:'8 reps',             equip:['bodyweight'] },
+  { name:'Standing Hip Circles',             reps:'6 each direction',   equip:['bodyweight'] },
+  { name:'Walking Hamstring Kicks',          reps:'10 each leg',        equip:['bodyweight'] },
+  { name:'Wall Squat Hold',                  reps:'30 sec',             equip:['bodyweight'] },
+  { name:'Arm Circles',                      reps:'10 each direction',  equip:['bodyweight'] },
+  { name:'Inchworm to Push-Up',              reps:'5 reps',             equip:['bodyweight'] },
+  { name:'Glute Bridge March',               reps:'10 each leg',        equip:['bodyweight'] },
+  { name:'Eccentric Push-Up (5s lowering)',  reps:'5 reps',             equip:['bodyweight'] },
+  { name:'Deep Squat Hold w/ T-Spine Rotation', reps:'5 each side',     equip:['bodyweight'] },
+  { name:'Standing Quad Stretch',            reps:'20 sec each side',   equip:['bodyweight'] },
+  { name:'Foam Roll – Quads & Upper Back',   reps:'45 sec',             equip:['foam'] }
+];
+
+// Main Set slots — one exercise chosen per slot = 5 exercise full-body circuit
+const MAIN_SET = {
+  hinge: [
+    { name:'Double KB Deadlift',            reps:'8-10 reps',       equip:['kb'] },
+    { name:'KB Kickstand RDL',              reps:'8 each side',     equip:['kb'] },
+    { name:'Single-Leg RDL – Dumbbell',     reps:'8 each side',     equip:['db'] },
+    { name:'Barbell Deadlift',              reps:'6-8 reps',        equip:['barbell'] },
+    { name:'Trap Bar Deadlift',             reps:'6-8 reps',        equip:['trapbar'] },
+    { name:'Barbell Hip Thrust',            reps:'10-12 reps',      equip:['barbell','bench'] },
+    { name:'Bodyweight Glute Bridge',       reps:'12-15 reps',      equip:['bodyweight'] },
+    { name:'Single-Leg RDL – Bodyweight',   reps:'8 each side',     equip:['bodyweight'] }
+  ],
+  squat: [
+    { name:'KB Goblet Squat',               reps:'8-10 reps',       equip:['kb'] },
+    { name:'DB Bulgarian Split Squat',      reps:'8 each side',     equip:['db','bench'] },
+    { name:'KB Walking Lunge',              reps:'8 each side',     equip:['kb'] },
+    { name:'Barbell Back Squat',            reps:'6-8 reps',        equip:['barbell'] },
+    { name:'Landmine Squat',                reps:'8-10 reps',       equip:['landmine'] },
+    { name:'TRX Pistol Squat',              reps:'6-8 each side',   equip:['trx'] },
+    { name:'DB Curtsy Lunge',               reps:'6 each side',     equip:['db'] },
+    { name:'Bodyweight Split Squat',        reps:'10 each side',    equip:['bodyweight'] }
+  ],
+  push: [
+    { name:'DB Bench Press',                reps:'8-10 reps',       equip:['db','bench'] },
+    { name:'DB Floor Press',                reps:'8-10 reps',       equip:['db'] },
+    { name:'DB Shoulder Press',             reps:'8 each side',     equip:['db'] },
+    { name:'Barbell Bench Press',           reps:'6-8 reps',        equip:['barbell','bench'] },
+    { name:'Landmine Press',                reps:'8 each side',     equip:['landmine'] },
+    { name:'KB Push Press',                 reps:'6 each side',     equip:['kb'] },
+    { name:'Push-Up',                       reps:'10-15 reps',      equip:['bodyweight'] }
+  ],
+  pull: [
+    { name:'Pull-Up / Chin-Up',             reps:'5-8 reps',        equip:['pullup'] },
+    { name:'Eccentric Pull-Up (5s lowering)', reps:'5 reps',         equip:['pullup'] },
+    { name:'Bent-Over Barbell Row',         reps:'8-10 reps',       equip:['barbell'] },
+    { name:'Bent-Over DB Row',              reps:'8-10 reps',       equip:['db'] },
+    { name:'Single-Arm KB Row',             reps:'8 each side',     equip:['kb'] },
+    { name:'TRX Row',                       reps:'10-12 reps',      equip:['trx'] },
+    { name:'Standing Cable Row',            reps:'10-12 reps',      equip:['cable'] },
+    { name:'Towel Row (doorframe/table)',   reps:'10-12 reps',      equip:['bodyweight'] },
+    { name:'Superman Row',                  reps:'12-15 reps',      equip:['bodyweight'] }
+  ],
+  core: [
+    { name:'Weighted Deadbug – Medicine Ball', reps:'12-16 reps',   equip:['medball'] },
+    { name:'Bodyweight Deadbug',            reps:'12-16 reps',      equip:['bodyweight'] },
+    { name:'Plank w/ Shoulder Tap',         reps:'16-20 taps',      equip:['bodyweight'] },
+    { name:'Half-Kneeling Pallof Press – Band', reps:'8 each side', equip:['bands'] },
+    { name:'Cable Pallof Press',            reps:'8 each side',     equip:['cable'] },
+    { name:'Hanging Knee Raise',            reps:'8-12 reps',       equip:['pullup'] },
+    { name:'Side Plank',                    reps:'20-30 sec each side', equip:['bodyweight'] }
+  ]
+};
+
+const FINISHER = {
+  arms: [
+    { name:'DB Bicep Curl',                 reps:'12 reps',         equip:['db'] },
+    { name:'DB Skullcrusher',               reps:'12 reps',         equip:['db','bench'] },
+    { name:'DB Lateral Raise',              reps:'12-15 reps',      equip:['db'] },
+    { name:'DB Rear Delt Fly',              reps:'12-15 reps',      equip:['db'] },
+    { name:'KB Bicep Curl',                 reps:'10-12 reps',      equip:['kb'] },
+    { name:'Band Tricep Extension',         reps:'12-15 reps',      equip:['bands'] },
+    { name:'Band Pull-Apart',               reps:'15 reps',         equip:['bands'] },
+    { name:'Bench Dips',                    reps:'10-12 reps',      equip:['bench'] },
+    { name:'Diamond Push-Up',               reps:'8-12 reps',       equip:['bodyweight'] },
+    { name:'Chair / Floor Tricep Dip',      reps:'10-12 reps',      equip:['bodyweight'] }
+  ],
+  core: [
+    { name:'Sit-Up',                        reps:'12-15 reps',      equip:['bodyweight'] },
+    { name:'Medicine Ball Sit-Up',          reps:'12-15 reps',      equip:['medball'] },
+    { name:'Medicine Ball Russian Twist',   reps:'20 reps (10 each side)', equip:['medball'] },
+    { name:'KB Side Bend',                  reps:'8 each side',     equip:['kb'] },
+    { name:'Side Plank Dip – Kettlebell',   reps:'8 each side',     equip:['kb'] },
+    { name:'Plank Hold',                    reps:'30-45 sec',       equip:['bodyweight'] },
+    { name:'Hollow Hold',                   reps:'20-30 sec',       equip:['bodyweight'] },
+    { name:'Reverse Crunch',                reps:'12-15 reps',      equip:['bodyweight'] }
+  ]
+};
+
+const STORAGE_KEY = 'noLiftsNoClaws.equipment.v1';
+const OPTIONAL_IDS = EQUIPMENT.filter(e => !e.always).map(e => e.id);
+
+const PRESETS = {
+  full: OPTIONAL_IDS,
+  bodyweight: [],
+  hotel: ['db','bench','bands']
+};
+
+function loadSavedEquipment() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveEquipmentState() {
+  const checkedIds = OPTIONAL_IDS.filter(id => {
+    const cb = document.getElementById('eq-' + id);
+    return cb && cb.checked;
+  });
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(checkedIds));
+  } catch (e) { /* ignore quota/privacy errors */ }
+}
+
+const equipGrid = document.getElementById('equipGrid');
+const savedEquipment = loadSavedEquipment();
+
+EQUIPMENT.forEach(item => {
+  const row = document.createElement('div');
+  row.className = 'equip-item' + (item.always ? ' disabled' : '');
+  row.dataset.id = item.id;
+
+  const checked = item.always
+    ? true
+    : (savedEquipment ? savedEquipment.includes(item.id) : item.pre);
+
+  row.innerHTML = `
+    <input type="checkbox" id="eq-${item.id}" ${checked ? 'checked' : ''} ${item.always ? 'disabled' : ''}>
+    <label for="eq-${item.id}">${item.label}${item.always ? ' (always on)' : ''}</label>
+  `;
+  if (checked) row.classList.add('checked');
+
+  const checkbox = row.querySelector('input');
+  row.addEventListener('click', (e) => {
+    if (item.always) return;
+    if (e.target.tagName !== 'INPUT') {
+      checkbox.checked = !checkbox.checked;
+    }
+    row.classList.toggle('checked', checkbox.checked);
+    saveEquipmentState();
+  });
+
+  equipGrid.appendChild(row);
+});
+
+document.querySelectorAll('#strengthView .preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const presetIds = new Set(PRESETS[btn.dataset.preset] || []);
+    OPTIONAL_IDS.forEach(id => {
+      const cb = document.getElementById('eq-' + id);
+      const row = cb.closest('.equip-item');
+      cb.checked = presetIds.has(id);
+      row.classList.toggle('checked', cb.checked);
+    });
+    saveEquipmentState();
+  });
+});
+
+function getCheckedEquipment() {
+  const set = new Set(['bodyweight']);
+  EQUIPMENT.forEach(item => {
+    const cb = document.getElementById('eq-' + item.id);
+    if (cb && cb.checked) set.add(item.id);
+  });
+  return set;
+}
+
+function filterPool(pool, checkedSet) {
+  return pool.filter(ex => ex.equip.every(id => checkedSet.has(id)));
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function bodyweightOnly(pool) {
+  return pool.filter(ex => ex.equip.length === 1 && ex.equip[0] === 'bodyweight');
+}
+
+// excludeNames = Set of exercise names used in the previous generated workout,
+// so back-to-back "Brew"s don't hand back an identical list. Exclusion is
+// relaxed automatically if it would leave too few equipment-valid options.
+function pickOne(pool, checkedSet, excludeNames) {
+  const equipValid = filterPool(pool, checkedSet);
+  let filtered = equipValid.filter(ex => !excludeNames.has(ex.name));
+  if (filtered.length === 0) filtered = equipValid;
+  if (filtered.length === 0) filtered = bodyweightOnly(pool);
+  return shuffle(filtered)[0];
+}
+
+function pickMany(pool, checkedSet, n, excludeNames) {
+  const equipValid = filterPool(pool, checkedSet);
+  let filtered = equipValid.filter(ex => !excludeNames.has(ex.name));
+  if (filtered.length < n) {
+    // top up with previously-used-but-equipment-valid options first
+    const topUp = equipValid.filter(ex => !filtered.includes(ex));
+    filtered = [...filtered, ...topUp];
+  }
+  if (filtered.length < n) {
+    const fallback = bodyweightOnly(pool);
+    const combined = [...new Map([...filtered, ...fallback].map(e => [e.name, e])).values()];
+    filtered = combined;
+  }
+  return shuffle(filtered).slice(0, n);
+}
+
+function labelForEquip(id) {
+  const found = EQUIPMENT.find(e => e.id === id);
+  return found ? found.label : id;
+}
+
+function renderList(el, exercises) {
+  el.innerHTML = '';
+  exercises.forEach((ex, i) => {
+    const li = document.createElement('li');
+    const checkId = `done-${el.id}-${i}`;
+    li.innerHTML = `
+      <input type="checkbox" class="ex-check" id="${checkId}">
+      <div class="ex-main">
+        <span class="ex-name">${ex.name}</span>
+        <span class="ex-equip">${ex.equip.map(labelForEquip).join(' + ')}</span>
+      </div>
+      <span class="ex-reps">${ex.reps}</span>
+    `;
+    const cb = li.querySelector('.ex-check');
+    cb.addEventListener('change', () => li.classList.toggle('completed', cb.checked));
+    el.appendChild(li);
+  });
+}
+
+function formatTime(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+function initTimer(containerId) {
+  const container = document.getElementById(containerId);
+  const duration = parseInt(container.dataset.duration, 10);
+  const display = container.querySelector('.timer-display');
+  const startBtn = container.querySelector('[data-action="start"]');
+  const pauseBtn = container.querySelector('[data-action="pause"]');
+  const resetBtn = container.querySelector('[data-action="reset"]');
+
+  let remaining = duration;
+  let interval = null;
+
+  function render() {
+    display.textContent = formatTime(remaining);
+  }
+
+  function stop() {
+    if (interval) { clearInterval(interval); interval = null; }
+  }
+
+  function tick() {
+    remaining -= 1;
+    render();
+    if (remaining <= 0) {
+      remaining = 0;
+      stop();
+      container.classList.add('flash');
+      setTimeout(() => container.classList.remove('flash'), 1800);
+    }
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (interval) return;
+    if (remaining <= 0) remaining = duration;
+    interval = setInterval(tick, 1000);
+  });
+  pauseBtn.addEventListener('click', stop);
+  resetBtn.addEventListener('click', () => {
+    stop();
+    container.classList.remove('flash');
+    remaining = duration;
+    render();
+  });
+
+  render();
+
+  return {
+    reset() {
+      stop();
+      container.classList.remove('flash');
+      remaining = duration;
+      render();
+    }
+  };
+}
+
+const warmupTimer = initTimer('warmupTimer');
+const restTimer = initTimer('restTimer');
+
+const generateBtn = document.getElementById('generateBtn');
+let hasGeneratedOnce = false;
+let lastWorkoutNames = new Set();
+
+generateBtn.addEventListener('click', () => {
+  generateBtn.disabled = true;
+  generateBtn.innerHTML = '<span class="spinner"></span>Grinding the beans...';
+
+  setTimeout(() => {
+    const checkedSet = getCheckedEquipment();
+    const usedNames = new Set();
+
+    const warmupPicks = pickMany(WARMUP, checkedSet, 5, lastWorkoutNames);
+    warmupPicks.forEach(ex => usedNames.add(ex.name));
+    renderList(document.getElementById('warmupList'), warmupPicks);
+
+    const slots = ['hinge','squat','push','pull','core'];
+    const mainPicks = slots.map(slot => pickOne(MAIN_SET[slot], checkedSet, lastWorkoutNames));
+    mainPicks.forEach(ex => usedNames.add(ex.name));
+    renderList(document.getElementById('mainList'), mainPicks);
+    document.getElementById('mainRoundsTag').textContent = '3 Rounds';
+
+    const focus = Math.random() < 0.5 ? 'arms' : 'core';
+    const finisherPicks = pickMany(FINISHER[focus], checkedSet, 2, lastWorkoutNames);
+    finisherPicks.forEach(ex => usedNames.add(ex.name));
+    document.getElementById('finisherTitle').textContent =
+      focus === 'arms' ? 'Finisher — Arms' : 'Finisher — Core';
+    document.getElementById('finisherRoundsTag').textContent = '3 Rounds';
+    renderList(document.getElementById('finisherList'), finisherPicks);
+
+    lastWorkoutNames = usedNames;
+
+    warmupTimer.reset();
+    restTimer.reset();
+
+    const workoutEl = document.getElementById('workout');
+    workoutEl.classList.add('visible');
+    workoutEl.scrollIntoView({ behavior:'smooth', block:'start' });
+
+    hasGeneratedOnce = true;
+    generateBtn.disabled = false;
+    generateBtn.textContent = hasGeneratedOnce ? 'Brew Another Round ☕' : 'Brew My Workout ☕';
+  }, 700);
+});
+
+
+/* =========================================================================
+   ========================  CONDITIONING GENERATOR  ========================
+   Fully independent from the Strength Generator above — separate data,
+   separate state variables, separate DOM ids. Nothing here touches the
+   Strength code, and nothing in the Strength code touches this.
+========================================================================= */
+
+// --- Data model, extracted from the running-session whiteboard spec ---
+
+const GRASS = {
+  warmup: {
+    name: 'Standard Field Warm-Up',
+    detail: '5 min light jog, dynamic mobility (leg swings, open/close gate, lunges), and plyometrics (pogo jumps, high knees).'
+  },
+  cooldown: {
+    name: 'Field Recovery',
+    detail: '5 min light walk, static hamstring/quad/calf stretching.'
+  },
+  // Block 1 — Agility, CNS & Acceleration
+  short: [
+    { name:'4-Cone Shuttle', detail:'4 cones 5m apart. Shuttle out, backpedal back, stride to halfway line.',
+      base:{ value:8, unit:'reps' }, weight:{ balanced:2, agility:3, aerobic:1 } },
+    { name:'100m Drop-Off Cutoff Test', detail:'100m shuttle (2x50m) in under 20s, 10s rest. Perform AMAP until you miss the cap.',
+      base:{ amap:true }, weight:{ balanced:1, agility:3, aerobic:1 } },
+    { name:'80m Micro-Intervals', detail:'50m out + 30m turn/backpedal, in 15s. 15s rest.',
+      base:{ sets:2, reps:8, unit:'reps' }, weight:{ balanced:2, agility:2, aerobic:1 } },
+    { name:'5-10-15m Acceleration Ladder', detail:'Sprint 5m (walk back), sprint 10m (walk back), sprint 15m (walk back) = 1 round.',
+      base:{ value:6, unit:'rounds' }, weight:{ balanced:2, agility:3, aerobic:1 } }
+  ],
+  // Block 2 — Speed Endurance & Strides
+  mid: [
+    { name:'Box-to-Box Strides', detail:'50-60m strides at 80% effort, with a jog build-up and decel zone.',
+      base:{ value:8, unit:'reps' }, weight:{ balanced:3, agility:2, aerobic:2 } },
+    { name:'400m Pitch Shuttles', detail:'8 lengths of the 50m pitch. 90s rest.',
+      base:{ value:4, unit:'reps' }, weight:{ balanced:2, agility:1, aerobic:3 } },
+    { name:'200m Pitch Shuttles', detail:'4 lengths of the 50m pitch. 30s rest between reps, 2-3 min rest between sets.',
+      base:{ sets:2, reps:4, unit:'reps' }, weight:{ balanced:2, agility:1, aerobic:2 } },
+    { name:'Diagonal Pitch Strides', detail:'Sprint the pitch diagonally (~60m), easy jog back along the short end-line.',
+      base:{ value:8, unit:'reps' }, weight:{ balanced:2, agility:2, aerobic:1 } }
+  ],
+  // Block 3 — Aerobic Capacity & Volume
+  long: [
+    { name:'Pitch Corner Ladder', detail:'Continuous loop: jog the short side, sprint the long side, building 1, 2, 3, then all 4 sides = 1 full lap.',
+      base:{ value:2, unit:'sets' }, weight:{ balanced:2, agility:1, aerobic:3 } },
+    { name:'600m Pitch Shuttles', detail:'12 lengths of the 50m pitch. 2 min rest.',
+      base:{ value:2, unit:'reps' }, weight:{ balanced:2, agility:1, aerobic:3 } },
+    { name:'Full Pitch Sprint/Walk Loops', detail:'Sprint the 100m long sides, walk/jog the 50m short sides.',
+      base:{ value:4, unit:'continuous laps' }, weight:{ balanced:1, agility:1, aerobic:3 } }
+  ]
+};
+
+// Road protocols are mapped 1:1 to Focus — chosen by intensity character
+// (Fartlek Surges = blended tempo -> Balanced; Landmark Surges = explosive
+// bursts -> Agility & Speed; Threshold Lap Reps = sustained tempo -> Aerobic).
+const ROAD_PROTOCOLS = {
+  balanced: { name:'Fartlek Surges', style:'continuous',
+    detail:'Run 2 minutes at 80% pace, then 1 minute of light recovery jogging — continuously for the full distance.' },
+  agility: { name:'Landmark/Straightaway Surges', style:'continuous',
+    detail:'Hard push on every straightaway, easy jog through all corners and inclines.' },
+  aerobic: { name:'Threshold Lap Reps', style:'reps',
+    detail:'Sustained fast tempo for each loop, with 3-4 minutes of static rest between loops.' }
+};
+
+const ROAD_LOOP_KM = 1.15; // midpoint of the 1.1km-1.2km standard loop
+
+const VOLUME = {
+  express:  { label:'Express',  timeLabel:'~20 min',    mult:0.7,  roadLaps:1, amapMin:5 },
+  standard: { label:'Standard', timeLabel:'~30-35 min', mult:1.0,  roadLaps:2, amapMin:8 },
+  heavy:    { label:'Heavy',    timeLabel:'~45 min',    mult:1.28, roadLaps:3, amapMin:12 }
+};
+
+const FOCUS_LABELS = { balanced:'Balanced', agility:'Agility & Speed', aerobic:'Aerobic & Capacity' };
+
+// --- Generic toggle-button group (Location / Volume / Focus) ---
+
+function setupToggleGroup(containerId, defaultValue) {
+  const container = document.getElementById(containerId);
+  let selected = defaultValue;
+  container.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selected = btn.dataset.value;
+    });
+  });
+  return { get: () => selected };
+}
+
+const locationGroup = setupToggleGroup('locationToggle', 'grass');
+const volumeGroup = setupToggleGroup('volumeToggle', 'standard');
+const focusGroup = setupToggleGroup('focusToggle', 'balanced');
+
+// --- Selection + scaling logic ---
+
+// Weighted random pick biased toward the chosen Focus. Falls back to the
+// full pool if excluding the previous pick would leave nothing to choose.
+function weightedPick(pool, focus, excludeNames) {
+  let candidates = pool.filter(ex => !excludeNames.has(ex.name));
+  if (candidates.length === 0) candidates = pool;
+  const weighted = [];
+  candidates.forEach(ex => {
+    const w = (ex.weight && ex.weight[focus]) || 1;
+    for (let i = 0; i < w; i++) weighted.push(ex);
+  });
+  return weighted[Math.floor(Math.random() * weighted.length)];
+}
+
+// Express: ~30% reduction. Standard: baseline. Heavy: ~28% increase, or
+// an extra set for sets x reps exercises (per the spec's "or add a set").
+function scaleGrassExercise(ex, volumeKey) {
+  const v = VOLUME[volumeKey];
+  const base = ex.base;
+
+  if (base.amap) {
+    return `AMAP for ~${v.amapMin} min — stop once you miss the 20s cap`;
+  }
+  if (base.sets) {
+    let sets = base.sets;
+    let reps = base.reps;
+    if (volumeKey === 'heavy') sets += 1;
+    else reps = Math.max(1, Math.round(reps * v.mult));
+    return `${sets} sets x ${reps} ${base.unit}`;
+  }
+  const value = Math.max(1, Math.round(base.value * v.mult));
+  return `${value} ${base.unit}`;
+}
+
+function generateGrassWorkout(focus, volumeKey, excludeNames) {
+  const shortEx = weightedPick(GRASS.short, focus, excludeNames);
+  const midEx = weightedPick(GRASS.mid, focus, excludeNames);
+  const longEx = weightedPick(GRASS.long, focus, excludeNames);
+
+  const stages = [
+    { tag:'Warm-Up', tagClass:'warmup', title:GRASS.warmup.name, detail:GRASS.warmup.detail, target:'5 min' },
+    { tag:'Block 1 — Short', tagClass:'main', title:shortEx.name, detail:shortEx.detail, target:scaleGrassExercise(shortEx, volumeKey) },
+    { tag:'Block 2 — Mid', tagClass:'main', title:midEx.name, detail:midEx.detail, target:scaleGrassExercise(midEx, volumeKey) },
+    { tag:'Block 3 — Long', tagClass:'main', title:longEx.name, detail:longEx.detail, target:scaleGrassExercise(longEx, volumeKey) },
+    { tag:'Cool-Down', tagClass:'warmup', title:GRASS.cooldown.name, detail:GRASS.cooldown.detail, target:'5 min' }
+  ];
+
+  return { stages, usedNames: new Set([shortEx.name, midEx.name, longEx.name]), summaryExtra:null };
+}
+
+function generateRoadWorkout(focus, volumeKey) {
+  const protocol = ROAD_PROTOCOLS[focus];
+  const v = VOLUME[volumeKey];
+  const workLaps = v.roadLaps;
+  const totalLaps = workLaps + 1; // + 0.5 warm-up + 0.5 cool-down = 1 full loop
+  const totalDistanceKm = (totalLaps * ROAD_LOOP_KM).toFixed(1);
+
+  const target = protocol.style === 'reps'
+    ? `${workLaps} x 1.1-1.2km loop${workLaps > 1 ? 's' : ''} at threshold tempo, 3-4 min static rest between`
+    : `${workLaps} continuous loop${workLaps > 1 ? 's' : ''} (~${(workLaps * ROAD_LOOP_KM).toFixed(1)}km) using the surge pattern above`;
+
+  const stages = [
+    { tag:'Warm-Up', tagClass:'warmup', title:'Easy Lap', detail:'0.5 lap easy jog to open up.', target:'0.5 lap' },
+    { tag:'Main Protocol', tagClass:'main', title:protocol.name, detail:protocol.detail, target },
+    { tag:'Cool-Down', tagClass:'warmup', title:'Easy Lap', detail:'0.5 lap easy jog / walk to bring the heart rate down.', target:'0.5 lap' }
+  ];
+
+  return { stages, usedNames: new Set([protocol.name]), summaryExtra:`~${totalDistanceKm}km total incl. warm-up/cool-down` };
+}
+
+// --- Rendering ---
+
+function renderConditioningWorkout(result, summaryLine) {
+  const container = document.getElementById('conditioningWorkout');
+  container.innerHTML = '';
+
+  const summary = document.createElement('div');
+  summary.className = 'cond-summary';
+  summary.textContent = summaryLine;
+  container.appendChild(summary);
+
+  result.stages.forEach(stage => {
+    const block = document.createElement('div');
+    block.className = 'block';
+    block.innerHTML = `
+      <div class="block-head">
+        <h3>${stage.title}</h3>
+        <span class="tag ${stage.tagClass}">${stage.tag}</span>
+      </div>
+      <div class="block-detail">${stage.detail}</div>
+      <div class="block-target"><strong>Target:</strong> ${stage.target}</div>
+    `;
+    container.appendChild(block);
+  });
+
+  container.classList.add('visible');
+}
+
+// --- Generate / Regenerate button (relabels itself after first use,
+//     same pattern as the Strength Generator's Brew button) ---
+
+const conditioningBtn = document.getElementById('conditioningGenerateBtn');
+let hasGeneratedConditioningOnce = false;
+let lastConditioningNames = new Set();
+
+conditioningBtn.addEventListener('click', () => {
+  conditioningBtn.disabled = true;
+  conditioningBtn.innerHTML = '<span class="spinner"></span>Plotting your session...';
+
+  setTimeout(() => {
+    const location = locationGroup.get();
+    const volumeKey = volumeGroup.get();
+    const focus = focusGroup.get();
+    const v = VOLUME[volumeKey];
+
+    let result;
+    let extraLine = '';
+
+    if (location === 'grass') {
+      result = generateGrassWorkout(focus, volumeKey, lastConditioningNames);
+    } else {
+      result = generateRoadWorkout(focus, volumeKey);
+      extraLine = ' • ' + result.summaryExtra;
+    }
+    lastConditioningNames = result.usedNames;
+
+    const locationLabel = location === 'grass' ? 'Grass Pitch' : 'Road Loop';
+    const summaryLine = `${locationLabel} • ${v.label} • ${FOCUS_LABELS[focus]} • ${v.timeLabel}${extraLine}`;
+
+    renderConditioningWorkout(result, summaryLine);
+
+    const workoutEl = document.getElementById('conditioningWorkout');
+    workoutEl.scrollIntoView({ behavior:'smooth', block:'start' });
+
+    hasGeneratedConditioningOnce = true;
+    conditioningBtn.disabled = false;
+    conditioningBtn.textContent = hasGeneratedConditioningOnce ? 'Regenerate 🔁' : 'Generate Workout 🏃';
+  }, 600);
+});
+</script>
+</body>
+</html>
