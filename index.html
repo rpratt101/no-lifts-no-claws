@@ -443,9 +443,11 @@
 
     <div class="panel">
       <h2>🌅 Morning Mobility Routine</h2>
-      <p class="sub">A 10-minute joint mobility &amp; tissue quality flow. Run it first thing in the morning or as a pre-training primer — no equipment needed.</p>
+      <p class="sub">A 10-minute joint mobility &amp; tissue quality flow, covering ankles to neck. Run it first thing in the morning or as a pre-training primer — no equipment needed.</p>
       <p class="mobility-intro">Move through each exercise in order, breathing slow and controlled. Tap the checkbox as you finish a move, and tap "Watch Demo" if you need a form check.</p>
     </div>
+
+    <button class="generate-btn" id="mobilityGenerateBtn">Generate Mobility Flow 🌀</button>
 
     <div class="block">
       <div class="block-head">
@@ -1117,36 +1119,116 @@ conditioningBtn.addEventListener('click', () => {
 
 
 /* =========================================================================
-   ========================  MORNING MOBILITY ROUTINE  ========================
-   Fixed 6-move flow, not randomized/generated. Fully independent from the
-   Strength and Conditioning generators above.
+   ========================  MORNING MOBILITY GENERATOR  ========================
+   Picks one exercise from each body region (ankle -> hip -> lower back/core
+   -> thoracic spine -> shoulder -> neck) every time, so each flow is a
+   fresh mix that still covers the whole body top-to-bottom. Region order
+   follows the "joint-by-joint" bottom-up warm-up sequence used widely in
+   S&C coaching. Fully independent from the Strength and Conditioning
+   generators above.
 ========================================================================= */
 
-const MOBILITY = [
-  { name:'Cat–Cow',
-    reps:'60 secs (8-10 slow reps)',
-    video:'https://www.youtube.com/results?search_query=cat+cow+stretch+exercise+tutorial' },
-  { name:'World\'s Greatest Stretch',
-    reps:'60 secs (5 reps/side)',
-    video:'https://www.youtube.com/results?search_query=worlds+greatest+stretch+tutorial' },
-  { name:'90/90 Hip Switch',
-    reps:'90 secs (8 reps/side)',
-    video:'https://www.youtube.com/results?search_query=90+90+hip+switch+mobility+drill' },
-  { name:'Thoracic Windmill (Open Book)',
-    reps:'90 secs (6 reps/side)',
-    video:'https://www.youtube.com/results?search_query=thoracic+windmill+open+book+stretch' },
-  { name:'Scapular Wall Slides',
-    reps:'60 secs (10 reps)',
-    video:'https://www.youtube.com/results?search_query=scapular+wall+slides+exercise+tutorial' },
-  { name:'Ankle Mobilization (Knee-to-Wall Rock)',
-    reps:'90 secs (10 reps/side)',
-    video:'https://www.youtube.com/results?search_query=ankle+mobilization+knee+to+wall+stretch' }
-];
+const MOBILITY_BANK = {
+  ankle: [
+    { name:'Ankle Mobilization (Knee-to-Wall Rock)',
+      reps:'90 secs (10 reps/side)',
+      video:'https://www.youtube.com/results?search_query=ankle+mobilization+knee+to+wall+stretch' },
+    { name:'Ankle Circles',
+      reps:'60 secs (10-15 each direction, each side)',
+      video:'https://www.youtube.com/results?search_query=ankle+circles+mobility+exercise+tutorial' },
+    { name:'Toe-to-Heel Rockers',
+      reps:'60 secs (rock continuously)',
+      video:'https://www.youtube.com/results?search_query=toe+to+heel+rockers+ankle+mobility' },
+    { name:'Deep Squat Hold w/ Heel Lift',
+      reps:'60 secs (3-5 reps, 5-10 sec hold)',
+      video:'https://www.youtube.com/results?search_query=deep+squat+hold+heel+lift+ankle+mobility' }
+  ],
+  hip: [
+    { name:'90/90 Hip Switch',
+      reps:'90 secs (8 reps/side)',
+      video:'https://www.youtube.com/results?search_query=90+90+hip+switch+mobility+drill' },
+    { name:'World\'s Greatest Stretch',
+      reps:'60 secs (5 reps/side)',
+      video:'https://www.youtube.com/results?search_query=worlds+greatest+stretch+tutorial' },
+    { name:'Cossack Squat',
+      reps:'60 secs (6 reps/side)',
+      video:'https://www.youtube.com/results?search_query=cossack+squat+mobility+exercise+tutorial' },
+    { name:'Half-Kneeling Adductor Rock',
+      reps:'60 secs (8-12 reps/side)',
+      video:'https://www.youtube.com/results?search_query=half+kneeling+adductor+rock+mobility' },
+    { name:'Figure-4 Piriformis Stretch',
+      reps:'60 secs (30 secs/side)',
+      video:'https://www.youtube.com/results?search_query=figure+4+piriformis+stretch+tutorial' }
+  ],
+  lowerback: [
+    { name:'Cat–Cow',
+      reps:'60 secs (8-10 slow reps)',
+      video:'https://www.youtube.com/results?search_query=cat+cow+stretch+exercise+tutorial' },
+    { name:'Quadruped Rock Back',
+      reps:'60 secs (10 reps)',
+      video:'https://www.youtube.com/results?search_query=quadruped+rock+back+mobility+exercise' },
+    { name:'Scorpion Stretch',
+      reps:'60 secs (6 reps/side)',
+      video:'https://www.youtube.com/results?search_query=scorpion+stretch+mobility+exercise+tutorial' },
+    { name:'Child\'s Pose to Cobra Flow',
+      reps:'60 secs (8 reps)',
+      video:'https://www.youtube.com/results?search_query=childs+pose+to+cobra+flow+mobility' }
+  ],
+  thoracic: [
+    { name:'Thoracic Windmill (Open Book)',
+      reps:'90 secs (6 reps/side)',
+      video:'https://www.youtube.com/results?search_query=thoracic+windmill+open+book+stretch' },
+    { name:'Side-Lying Thoracic Rotation',
+      reps:'60 secs (8 reps/side)',
+      video:'https://www.youtube.com/results?search_query=side+lying+thoracic+rotation+mobility' },
+    { name:'Thread the Needle',
+      reps:'60 secs (6 reps/side)',
+      video:'https://www.youtube.com/results?search_query=thread+the+needle+thoracic+mobility+tutorial' },
+    { name:'Standing Torso Twist',
+      reps:'60 secs (10 reps/side)',
+      video:'https://www.youtube.com/results?search_query=standing+torso+twist+mobility+exercise' }
+  ],
+  shoulder: [
+    { name:'Scapular Wall Slides',
+      reps:'60 secs (10 reps)',
+      video:'https://www.youtube.com/results?search_query=scapular+wall+slides+exercise+tutorial' },
+    { name:'Shoulder CARs (Controlled Articular Rotations)',
+      reps:'60 secs (5 reps/arm)',
+      video:'https://www.youtube.com/results?search_query=shoulder+cars+controlled+articular+rotations+tutorial' },
+    { name:'Arm Circles',
+      reps:'60 secs (10 each direction)',
+      video:'https://www.youtube.com/results?search_query=arm+circles+shoulder+mobility+exercise' }
+  ],
+  neck: [
+    { name:'Neck Circles',
+      reps:'60 secs (8 each direction)',
+      video:'https://www.youtube.com/results?search_query=neck+circles+mobility+exercise+tutorial' },
+    { name:'Chin Tucks',
+      reps:'60 secs (10 reps)',
+      video:'https://www.youtube.com/results?search_query=chin+tucks+neck+mobility+exercise+tutorial' }
+  ]
+};
 
-function renderMobilityList() {
+// Bottom-up region order, mirroring the "joint-by-joint" warm-up sequence
+const MOBILITY_REGIONS = ['ankle','hip','lowerback','thoracic','shoulder','neck'];
+
+let lastMobilityNames = new Set();
+
+function generateMobilityFlow() {
+  const picks = MOBILITY_REGIONS.map(region => {
+    const pool = MOBILITY_BANK[region];
+    let candidates = pool.filter(ex => !lastMobilityNames.has(ex.name));
+    if (candidates.length === 0) candidates = pool;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  });
+  lastMobilityNames = new Set(picks.map(ex => ex.name));
+  return picks;
+}
+
+function renderMobilityList(exercises) {
   const el = document.getElementById('mobilityList');
   el.innerHTML = '';
-  MOBILITY.forEach((ex, i) => {
+  exercises.forEach((ex, i) => {
     const li = document.createElement('li');
     const checkId = `done-mobility-${i}`;
     li.innerHTML = `
@@ -1162,11 +1244,24 @@ function renderMobilityList() {
     el.appendChild(li);
   });
   const tag = document.getElementById('mobilityCountTag');
-  if (tag) tag.textContent = `${MOBILITY.length} Moves`;
+  if (tag) tag.textContent = `${exercises.length} Moves`;
 }
 
-renderMobilityList();
+const mobilityGenerateBtn = document.getElementById('mobilityGenerateBtn');
+let hasGeneratedMobilityOnce = false;
+
+function runMobilityGeneration() {
+  const flow = generateMobilityFlow();
+  renderMobilityList(flow);
+  mobilityTimer.reset();
+  hasGeneratedMobilityOnce = true;
+  mobilityGenerateBtn.textContent = 'Generate Another Flow 🌀';
+}
+
+mobilityGenerateBtn.addEventListener('click', runMobilityGeneration);
+
 const mobilityTimer = initTimer('mobilityTimer');
+runMobilityGeneration();
 </script>
 </body>
 </html>
