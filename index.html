@@ -1056,7 +1056,7 @@ const TRACK = {
   ],
   mid: [
     { name:'400m Repeats', detail:'Run 400m at roughly 5K race pace, with a jog recovery between reps.',
-      base:{ value:8, unit:'x 400m @ 5K pace (200-400m jog recovery)' }, weight:{ balanced:3, agility:2, aerobic:2 } },
+      base:{ value:6, unit:'x 400m @ 5K pace (200-400m jog recovery)' }, weight:{ balanced:3, agility:2, aerobic:2 } },
     { name:'Beginner Pyramid', detail:'Hold roughly 5K race effort throughout, with a 200m jog recovery between each rep.',
       base:{ targets:{
         express:'200-400-800-400m (drop the final 200m leg)',
@@ -1064,26 +1064,26 @@ const TRACK = {
         heavy:'200-400-800-400-200m pyramid, then an extra 400m to finish'
       } }, weight:{ balanced:3, agility:1, aerobic:3 } },
     { name:'800m Repeats', detail:'Run 800m (two laps) around 5K pace, with a jog recovery between reps.',
-      base:{ value:5, unit:'x 800m @ 5K pace (200-400m jog recovery)' }, weight:{ balanced:2, agility:1, aerobic:3 } }
+      base:{ value:4, unit:'x 800m @ 5K pace (200-400m jog recovery)' }, weight:{ balanced:2, agility:1, aerobic:3 } }
   ],
   long: [
     { name:'Full Pyramid', detail:'Hold roughly 5K race effort throughout, with a 200-400m jog recovery between reps.',
       base:{ targets:{
-        express:'400-800-1600-800-400m (drop the two 200m legs)',
-        standard:'200-400-800-1600-800-400-200m pyramid',
-        heavy:'200-400-800-1600-800-400-200m pyramid, then an extra 400m to finish'
+        express:'400-600-400m (drop the two 200m legs)',
+        standard:'200-400-600-400-200m pyramid',
+        heavy:'200-400-600-400-200m pyramid, then an extra 400m to finish'
       } }, weight:{ balanced:2, agility:1, aerobic:3 } },
-    { name:'Classic Descending Ladder', detail:'Run each leg progressively faster as the distance drops. ~2:30 jog recovery between the longer reps.',
+    { name:'Classic Descending Ladder', detail:'Run each leg progressively faster as the distance drops, with a 200-400m jog recovery between reps.',
       base:{ targets:{
-        express:'1200-800-400m (drop the two outer legs)',
-        standard:'1600-1200-800-400-200m ladder',
-        heavy:'1600-1200-800-400-200m ladder, then repeat the 400-200m once more'
+        express:'600-400-200m (drop the 800m leg)',
+        standard:'800-600-400-200m ladder',
+        heavy:'800-600-400-200m ladder, then repeat the 400-200m once more'
       } }, weight:{ balanced:1, agility:1, aerobic:3 } },
     { name:'Ascending Ladder', detail:'Run at 10K-to-threshold pace, with a 400m jog recovery between reps.',
       base:{ targets:{
-        express:'800-1200m (drop the two longest legs)',
-        standard:'800-1200-1600-2000m ladder',
-        heavy:'800-1200-1600-2000m ladder, then an extra 800m to finish'
+        express:'400-600m (drop the two longest legs)',
+        standard:'400-600-800-1000m ladder',
+        heavy:'400-600-800-1000m ladder, then an extra 400m to finish'
       } }, weight:{ balanced:1, agility:1, aerobic:3 } }
   ]
 };
