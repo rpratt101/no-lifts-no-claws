@@ -3,25 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <title>No Lifts, No Claws</title>
 <style>
   :root{
-    --bg:#0e0f11;
-    --bg-card:#17191c;
-    --bg-card-2:#1e2124;
-    --border:#2a2d31;
-    --text:#f1f2f4;
-    --text-dim:#9aa0a6;
-    --accent:#ff5a1f;
+    --bg:#0a0d12;
+    --bg-card:#141820;
+    --bg-card-2:#1a1f29;
+    --border:#262c35;
+    --text:#f2f4f7;
+    --text-dim:#a7afba;
+    --accent:#22d3ee;
     --accent-2:#ffb020;
-    --green:#3ddc84;
+    --accent-3:#60a5fa;
+    --green:#34d399;
     --radius:14px;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
-    font-family:'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
-    background:radial-gradient(circle at top left,#1a1c1f,#0e0f11 60%);
+    font-family:'Inter', 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+    background:radial-gradient(circle at top left,#151a22,#0a0d12 60%);
     color:var(--text);
     min-height:100vh;
     padding:32px 16px 60px;
@@ -32,7 +36,7 @@
     font-size:2.2rem;
     margin:0 0 6px;
     letter-spacing:-0.5px;
-    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    background:linear-gradient(90deg,var(--accent),var(--accent-3));
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
@@ -58,7 +62,7 @@
     transition:border-color .15s, color .15s, background .15s;
   }
   .tab-btn:hover{border-color:var(--accent);}
-  .tab-btn.active{border-color:var(--accent);color:var(--accent-2);background:#241a14;}
+  .tab-btn.active{border-color:var(--accent);color:var(--accent);background:#0f2830;}
 
   .view{display:none;}
   .view.active{display:block;}
@@ -91,7 +95,7 @@
     cursor:pointer;
     transition:border-color .15s, color .15s;
   }
-  .preset-btn:hover{border-color:var(--accent);color:var(--accent-2);}
+  .preset-btn:hover{border-color:var(--accent);color:var(--accent);}
 
   .toggle-row{display:flex;gap:10px;flex-wrap:wrap;}
   .toggle-btn{
@@ -106,7 +110,7 @@
     transition:border-color .15s, color .15s, background .15s;
   }
   .toggle-btn:hover{border-color:var(--accent);}
-  .toggle-btn.active{border-color:var(--accent);background:#241a14;color:var(--accent-2);}
+  .toggle-btn.active{border-color:var(--accent);background:#0f2830;color:var(--accent);}
 
   .equip-grid{
     display:grid;
@@ -126,7 +130,7 @@
     user-select:none;
   }
   .equip-item:hover{border-color:var(--accent);}
-  .equip-item.checked{border-color:var(--accent);background:#241a14;}
+  .equip-item.checked{border-color:var(--accent);background:#0f2830;}
   .equip-item input{accent-color:var(--accent);width:16px;height:16px;cursor:pointer;}
   .equip-item.disabled{opacity:0.6;cursor:not-allowed;}
   .equip-item label{font-size:0.9rem;cursor:pointer;flex:1;}
@@ -138,15 +142,15 @@
     font-size:1.05rem;
     font-weight:700;
     letter-spacing:0.3px;
-    color:#111;
-    background:linear-gradient(90deg,var(--accent-2),var(--accent));
+    color:#0a0d12;
+    background:linear-gradient(90deg,var(--accent-3),var(--accent));
     border:none;
     border-radius:12px;
     cursor:pointer;
     transition:transform .12s, box-shadow .12s, opacity .15s;
-    box-shadow:0 8px 24px rgba(255,90,31,0.25);
+    box-shadow:0 8px 24px rgba(34,211,238,0.25);
   }
-  .generate-btn:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(255,90,31,0.35);}
+  .generate-btn:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(34,211,238,0.35);}
   .generate-btn:active{transform:translateY(0);}
   .generate-btn:disabled{cursor:wait;opacity:0.88;}
 
@@ -154,7 +158,7 @@
     display:inline-block;
     width:14px;height:14px;
     border:2px solid rgba(0,0,0,0.25);
-    border-top-color:#111;
+    border-top-color:#0a0d12;
     border-radius:50%;
     animation:spin 0.6s linear infinite;
     margin-right:8px;
@@ -168,7 +172,7 @@
 
   .cond-summary{
     text-align:center;
-    color:var(--accent-2);
+    color:var(--accent);
     font-size:0.8rem;
     font-weight:700;
     text-transform:uppercase;
@@ -202,8 +206,8 @@
     white-space:nowrap;
   }
   .tag.warmup{background:#1c2b22;color:var(--green);}
-  .tag.main{background:#2b2314;color:var(--accent-2);}
-  .tag.finisher{background:#2a1a25;color:#ff6ec7;}
+  .tag.main{background:#0f2830;color:var(--accent);}
+  .tag.finisher{background:#2b2314;color:var(--accent-2);}
 
   .ex-list{list-style:none;margin:0;padding:0;}
   .ex-list li{
@@ -221,7 +225,7 @@
   .ex-name{font-weight:600;}
   .ex-equip{display:block;color:var(--text-dim);font-size:0.78rem;margin-top:2px;font-weight:400;}
   .ex-reps{
-    color:var(--accent-2);
+    color:var(--accent);
     font-weight:700;
     white-space:nowrap;
     font-size:0.9rem;
@@ -232,7 +236,7 @@
   .block-note{padding:10px 22px;color:var(--text-dim);font-size:0.8rem;background:var(--bg-card-2);}
   .block-detail{padding:14px 22px;color:var(--text-dim);font-size:0.88rem;line-height:1.5;}
   .block-target{padding:0 22px 16px;font-size:0.9rem;}
-  .block-target strong{color:var(--accent-2);}
+  .block-target strong{color:var(--accent);}
 
   .timer-box{
     display:flex;
@@ -250,7 +254,7 @@
     font-size:1.6rem;
     font-weight:700;
     letter-spacing:1px;
-    color:var(--accent-2);
+    color:var(--accent);
     min-width:66px;
   }
   .timer-box.compact .timer-display{font-size:1.3rem;min-width:56px;}
@@ -306,15 +310,29 @@
     padding:3px 10px;
     border:1px solid var(--border);
     border-radius:20px;
-    color:var(--accent-2);
+    color:var(--accent);
     font-size:0.74rem;
     font-weight:700;
     text-decoration:none;
     transition:border-color .15s, color .15s, background .15s;
   }
-  .video-link:hover{border-color:var(--accent);background:#241a14;}
+  .video-link:hover{border-color:var(--accent);background:#0f2830;}
 
   .mobility-intro{color:var(--text-dim);font-size:0.88rem;line-height:1.5;margin:0 0 4px;}
+
+  header h1,
+  .panel h2,
+  .tab-btn,
+  .generate-btn,
+  .block-head h3,
+  .tag,
+  .timer-display,
+  .ex-reps,
+  .cond-summary,
+  .block-target strong,
+  .footer-signoff{
+    font-family:'Space Grotesk', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  }
 
 </style>
 </head>
