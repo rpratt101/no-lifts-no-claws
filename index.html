@@ -481,9 +481,10 @@
         </svg>
         Location
       </h2>
-      <p class="sub">Grass Pitch assembles a 5-stage session; Road Loop builds a single loop protocol.</p>
+      <p class="sub">Grass Pitch and Running Track each assemble a 5-stage session; Road Loop builds a single loop protocol.</p>
       <div class="toggle-row" id="locationToggle">
         <button class="toggle-btn active" data-value="grass">Grass Pitch</button>
+        <button class="toggle-btn" data-value="track">Running Track</button>
         <button class="toggle-btn" data-value="road">Road Loop</button>
       </div>
     </div>
@@ -1026,6 +1027,67 @@ const GRASS = {
   ]
 };
 
+// Running Track — a standard 400m oval. Reuses the same short/mid/long,
+// speed -> speed-endurance -> aerobic-capacity structure as Grass Pitch,
+// but with track-specific interval/ladder/pyramid sessions instead of
+// pitch-shape-dependent drills (sourced from standard track coaching
+// references: 200m/400m/800m repeats, descending/ascending ladders,
+// and pyramid sessions).
+const TRACK = {
+  warmup: {
+    name: 'Track Warm-Up',
+    detail: '800m easy jog around the track, dynamic mobility, then 4x60m strides building to race pace.'
+  },
+  cooldown: {
+    name: 'Track Cool-Down',
+    detail: '800m easy jog, then static hamstring/quad/calf stretching.'
+  },
+  short: [
+    { name:'200m Repeats', detail:'Run 200m hard, then jog 200m (half a lap) to recover before the next rep.',
+      base:{ value:8, unit:'x 200m @ ~90% effort (200m jog recovery)' }, weight:{ balanced:2, agility:3, aerobic:1 } },
+    { name:'400m Speed Repeats', detail:'Run 400m (one lap) at ~90% effort, then jog a full lap to fully recover.',
+      base:{ value:5, unit:'x 400m @ ~90% effort (400m jog recovery)' }, weight:{ balanced:2, agility:3, aerobic:1 } },
+    { name:'Speed Descending Ladder', detail:'Each rep faster than 5K pace as the distance drops, with a 200m jog recovery between reps.',
+      base:{ targets:{
+        express:'800-600-400m (drop the two shortest legs)',
+        standard:'800-600-400-300-200m ladder',
+        heavy:'800-600-400-300-200m ladder, then repeat the 400-300-200m once more'
+      } }, weight:{ balanced:2, agility:3, aerobic:1 } }
+  ],
+  mid: [
+    { name:'400m Repeats', detail:'Run 400m at roughly 5K race pace, with a jog recovery between reps.',
+      base:{ value:6, unit:'x 400m @ 5K pace (200-400m jog recovery)' }, weight:{ balanced:3, agility:2, aerobic:2 } },
+    { name:'Beginner Pyramid', detail:'Hold roughly 5K race effort throughout, with a 200m jog recovery between each rep.',
+      base:{ targets:{
+        express:'200-400-800-400m (drop the final 200m leg)',
+        standard:'200-400-800-400-200m pyramid',
+        heavy:'200-400-800-400-200m pyramid, then an extra 400m to finish'
+      } }, weight:{ balanced:3, agility:1, aerobic:3 } },
+    { name:'800m Repeats', detail:'Run 800m (two laps) around 5K pace, with a jog recovery between reps.',
+      base:{ value:4, unit:'x 800m @ 5K pace (200-400m jog recovery)' }, weight:{ balanced:2, agility:1, aerobic:3 } }
+  ],
+  long: [
+    { name:'Full Pyramid', detail:'Hold roughly 5K race effort throughout, with a 200-400m jog recovery between reps.',
+      base:{ targets:{
+        express:'400-600-400m (drop the two 200m legs)',
+        standard:'200-400-600-400-200m pyramid',
+        heavy:'200-400-600-400-200m pyramid, then an extra 400m to finish'
+      } }, weight:{ balanced:2, agility:1, aerobic:3 } },
+    { name:'Classic Descending Ladder', detail:'Run each leg progressively faster as the distance drops, with a 200-400m jog recovery between reps.',
+      base:{ targets:{
+        express:'600-400-200m (drop the 800m leg)',
+        standard:'800-600-400-200m ladder',
+        heavy:'800-600-400-200m ladder, then repeat the 400-200m once more'
+      } }, weight:{ balanced:1, agility:1, aerobic:3 } },
+    { name:'Ascending Ladder', detail:'Run at 10K-to-threshold pace, with a 400m jog recovery between reps.',
+      base:{ targets:{
+        express:'400-600m (drop the two longest legs)',
+        standard:'400-600-800-1000m ladder',
+        heavy:'400-600-800-1000m ladder, then an extra 400m to finish'
+      } }, weight:{ balanced:1, agility:1, aerobic:3 } }
+  ]
+};
+
 // Road protocols are mapped 1:1 to Focus — chosen by intensity character
 // (Fartlek Surges = blended tempo -> Balanced; Landmark Surges = explosive
 // bursts -> Agility & Speed; Threshold Lap Reps = sustained tempo -> Aerobic).
@@ -1084,10 +1146,16 @@ function weightedPick(pool, focus, excludeNames) {
 
 // Express: ~30% reduction. Standard: baseline. Heavy: ~28% increase, or
 // an extra set for sets x reps exercises (per the spec's "or add a set").
-function scaleGrassExercise(ex, volumeKey) {
+function scaleRepExercise(ex, volumeKey) {
   const v = VOLUME[volumeKey];
   const base = ex.base;
 
+  if (base.targets) {
+    // Ladder/pyramid sessions are hand-written per volume level rather than
+    // mathematically scaled, since trimming/extending a ladder isn't a
+    // simple multiply-by-percentage operation.
+    return base.targets[volumeKey];
+  }
   if (base.amap) {
     return `AMAP for ~${v.amapMin} min — stop once you miss the 20s cap`;
   }
@@ -1109,10 +1177,26 @@ function generateGrassWorkout(focus, volumeKey, excludeNames) {
 
   const stages = [
     { tag:'Warm-Up', tagClass:'warmup', title:GRASS.warmup.name, detail:GRASS.warmup.detail, target:'5 min' },
-    { tag:'Block 1 — Short', tagClass:'main', title:shortEx.name, detail:shortEx.detail, target:scaleGrassExercise(shortEx, volumeKey) },
-    { tag:'Block 2 — Mid', tagClass:'main', title:midEx.name, detail:midEx.detail, target:scaleGrassExercise(midEx, volumeKey) },
-    { tag:'Block 3 — Long', tagClass:'main', title:longEx.name, detail:longEx.detail, target:scaleGrassExercise(longEx, volumeKey) },
+    { tag:'Block 1 — Short', tagClass:'main', title:shortEx.name, detail:shortEx.detail, target:scaleRepExercise(shortEx, volumeKey) },
+    { tag:'Block 2 — Mid', tagClass:'main', title:midEx.name, detail:midEx.detail, target:scaleRepExercise(midEx, volumeKey) },
+    { tag:'Block 3 — Long', tagClass:'main', title:longEx.name, detail:longEx.detail, target:scaleRepExercise(longEx, volumeKey) },
     { tag:'Cool-Down', tagClass:'warmup', title:GRASS.cooldown.name, detail:GRASS.cooldown.detail, target:'5 min' }
+  ];
+
+  return { stages, usedNames: new Set([shortEx.name, midEx.name, longEx.name]), summaryExtra:null };
+}
+
+function generateTrackWorkout(focus, volumeKey, excludeNames) {
+  const shortEx = weightedPick(TRACK.short, focus, excludeNames);
+  const midEx = weightedPick(TRACK.mid, focus, excludeNames);
+  const longEx = weightedPick(TRACK.long, focus, excludeNames);
+
+  const stages = [
+    { tag:'Warm-Up', tagClass:'warmup', title:TRACK.warmup.name, detail:TRACK.warmup.detail, target:'800m' },
+    { tag:'Block 1 — Short', tagClass:'main', title:shortEx.name, detail:shortEx.detail, target:scaleRepExercise(shortEx, volumeKey) },
+    { tag:'Block 2 — Mid', tagClass:'main', title:midEx.name, detail:midEx.detail, target:scaleRepExercise(midEx, volumeKey) },
+    { tag:'Block 3 — Long', tagClass:'main', title:longEx.name, detail:longEx.detail, target:scaleRepExercise(longEx, volumeKey) },
+    { tag:'Cool-Down', tagClass:'warmup', title:TRACK.cooldown.name, detail:TRACK.cooldown.detail, target:'800m' }
   ];
 
   return { stages, usedNames: new Set([shortEx.name, midEx.name, longEx.name]), summaryExtra:null };
@@ -1188,13 +1272,15 @@ conditioningBtn.addEventListener('click', () => {
 
     if (location === 'grass') {
       result = generateGrassWorkout(focus, volumeKey, lastConditioningNames);
+    } else if (location === 'track') {
+      result = generateTrackWorkout(focus, volumeKey, lastConditioningNames);
     } else {
       result = generateRoadWorkout(focus, volumeKey);
       extraLine = ' • ' + result.summaryExtra;
     }
     lastConditioningNames = result.usedNames;
 
-    const locationLabel = location === 'grass' ? 'Grass Pitch' : 'Road Loop';
+    const locationLabel = location === 'grass' ? 'Grass Pitch' : location === 'track' ? 'Running Track' : 'Road Loop';
     const summaryLine = `${locationLabel} • ${v.label} • ${FOCUS_LABELS[focus]} • ${v.timeLabel}${extraLine}`;
 
     renderConditioningWorkout(result, summaryLine);
