@@ -350,6 +350,22 @@
   }
   .video-link:hover{border-color:var(--accent);background:var(--accent-tint);}
 
+  .log-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .log-input{
+    background:var(--bg-card-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:8px;
+    padding:5px 10px;
+    font-size:0.8rem;
+    width:130px;
+    font-family:'Inter', 'Segoe UI', system-ui, sans-serif;
+  }
+  .log-input::placeholder{color:var(--text-dim);}
+  .log-input:focus{outline:none;border-color:var(--accent);}
+  .log-last{color:var(--text-dim);font-size:0.74rem;}
+  .block-log{padding:0 22px 16px;}
+
   .mobility-intro{color:var(--text-dim);font-size:0.88rem;line-height:1.5;margin:0 0 4px;}
 
   .brand-row{display:flex;align-items:center;justify-content:center;gap:10px;}
@@ -715,6 +731,59 @@ const FINISHER = {
 };
 
 const STORAGE_KEY = 'noLiftsNoClaws.equipment.v1';
+
+// Per-exercise "last time" log — keyed by exercise/stage name, stores only
+// the single most recent entry (not a full history). Shared by the
+// Strength and Conditioning generators below.
+const EXERCISE_LOG_KEY = 'noLiftsNoClaws.exerciseLog.v1';
+
+function loadExerciseLog() {
+  try {
+    const raw = localStorage.getItem(EXERCISE_LOG_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return (parsed && typeof parsed === 'object') ? parsed : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveExerciseLogEntry(name, value) {
+  const log = loadExerciseLog();
+  const date = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  log[name] = { value, date };
+  try {
+    localStorage.setItem(EXERCISE_LOG_KEY, JSON.stringify(log));
+  } catch (e) { /* ignore quota/privacy errors */ }
+}
+
+function lastLogText(name) {
+  const entry = loadExerciseLog()[name];
+  return entry ? `Last: ${entry.value} · ${entry.date}` : 'No history yet';
+}
+
+function buildLogRowHTML(name, inputId) {
+  const safeName = name.replace(/"/g, '&quot;');
+  return `
+    <div class="log-row">
+      <input type="text" class="log-input" id="${inputId}" placeholder="Log what you did">
+      <span class="log-last" data-log-name="${safeName}">${lastLogText(name)}</span>
+    </div>
+  `;
+}
+
+function wireLogInput(container, name) {
+  const logInput = container.querySelector('.log-input');
+  const logLast = container.querySelector('.log-last');
+  if (!logInput || !logLast) return;
+  logInput.addEventListener('blur', () => {
+    const val = logInput.value.trim();
+    if (!val) return;
+    saveExerciseLogEntry(name, val);
+    logLast.textContent = lastLogText(name);
+    logInput.value = '';
+  });
+}
 const OPTIONAL_IDS = EQUIPMENT.filter(e => !e.always).map(e => e.id);
 
 const PRESETS = {
@@ -846,22 +915,25 @@ function labelForEquip(id) {
   return found ? found.label : id;
 }
 
-function renderList(el, exercises) {
+function renderList(el, exercises, showLog = true) {
   el.innerHTML = '';
   exercises.forEach((ex, i) => {
     const li = document.createElement('li');
     const checkId = `done-${el.id}-${i}`;
+    const logId = `log-${el.id}-${i}`;
     li.innerHTML = `
       <input type="checkbox" class="ex-check" id="${checkId}">
       <div class="ex-main">
         <span class="ex-name">${ex.name}</span>
         <span class="ex-equip">${ex.equip.map(labelForEquip).join(' + ')}</span>
         <a class="video-link" href="${ex.video}" target="_blank" rel="noopener noreferrer">📺 Watch Demo</a>
+        ${showLog ? buildLogRowHTML(ex.name, logId) : ''}
       </div>
       <span class="ex-reps">${ex.reps}</span>
     `;
     const cb = li.querySelector('.ex-check');
     cb.addEventListener('change', () => li.classList.toggle('completed', cb.checked));
+    if (showLog) wireLogInput(li, ex.name);
     el.appendChild(li);
   });
 }
@@ -944,7 +1016,7 @@ generateBtn.addEventListener('click', () => {
 
     const warmupPicks = pickMany(WARMUP, checkedSet, 5, lastWorkoutNames);
     warmupPicks.forEach(ex => usedNames.add(ex.name));
-    renderList(document.getElementById('warmupList'), warmupPicks);
+    renderList(document.getElementById('warmupList'), warmupPicks, false);
 
     const slots = ['hinge','squat','push','pull','core'];
     const mainPicks = slots.map(slot => pickOne(MAIN_SET[slot], checkedSet, lastWorkoutNames));
@@ -1233,9 +1305,11 @@ function renderConditioningWorkout(result, summaryLine) {
   summary.textContent = summaryLine;
   container.appendChild(summary);
 
-  result.stages.forEach(stage => {
+  result.stages.forEach((stage, i) => {
     const block = document.createElement('div');
     block.className = 'block';
+    const isWorkStage = stage.tagClass === 'main';
+    const logId = `cond-log-${i}`;
     block.innerHTML = `
       <div class="block-head">
         <h3>${stage.title}</h3>
@@ -1243,8 +1317,10 @@ function renderConditioningWorkout(result, summaryLine) {
       </div>
       <div class="block-detail">${stage.detail}</div>
       <div class="block-target"><strong>Target:</strong> ${stage.target}</div>
+      ${isWorkStage ? `<div class="block-log">${buildLogRowHTML(stage.title, logId)}</div>` : ''}
     `;
     container.appendChild(block);
+    if (isWorkStage) wireLogInput(block, stage.title);
   });
 
   container.classList.add('visible');
