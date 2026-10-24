@@ -699,7 +699,8 @@ const EQUIPMENT = [
   { id:'cable',      label:'Cable Machine',          pre:false },
   { id:'landmine',   label:'Landmine Attachment',    pre:false },
   { id:'bands',      label:'Resistance Bands',       pre:false },
-  { id:'foam',       label:'Foam Roller',            pre:false }
+  { id:'foam',       label:'Foam Roller',            pre:false },
+  { id:'mace',       label:'Macebell',               pre:false, fullGym:false }
 ];
 
 const WARMUP = [
@@ -728,7 +729,8 @@ const MAIN_SET = {
     { name:'Trap Bar Deadlift', reps:'6-8 reps', equip:['trapbar'], video:'https://www.youtube.com/results?search_query=trap+bar+deadlift+trap+bar+exercise+tutorial' },
     { name:'Barbell Hip Thrust', reps:'10-12 reps', equip:['barbell','bench'], video:'https://www.youtube.com/results?search_query=barbell+hip+thrust+barbell+bench+exercise+tutorial' },
     { name:'Bodyweight Glute Bridge', reps:'12-15 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=bodyweight+glute+bridge+exercise+tutorial' },
-    { name:'Single-Leg RDL – Bodyweight', reps:'8 each side', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=single+leg+rdl+bodyweight+exercise+tutorial' }
+    { name:'Single-Leg RDL – Bodyweight', reps:'8 each side', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=single+leg+rdl+bodyweight+exercise+tutorial' },
+    { name:'Mace Thor\'s Hammer (Uppercut Swing)', reps:'8 each side', equip:['mace'], video:'https://www.youtube.com/results?search_query=mace+thors+hammer+uppercut+swing+steel+mace+exercise+tutorial' }
   ],
   squat: [
     { name:'KB Goblet Squat', reps:'8-10 reps', equip:['kb'], video:'https://www.youtube.com/results?search_query=kb+goblet+squat+kettlebell+exercise+tutorial' },
@@ -738,7 +740,8 @@ const MAIN_SET = {
     { name:'Landmine Squat', reps:'8-10 reps', equip:['landmine'], video:'https://www.youtube.com/results?search_query=landmine+squat+landmine+exercise+tutorial' },
     { name:'TRX Pistol Squat', reps:'6-8 each side', equip:['trx'], video:'https://www.youtube.com/results?search_query=trx+pistol+squat+trx+exercise+tutorial' },
     { name:'DB Curtsy Lunge', reps:'6 each side', equip:['db'], video:'https://www.youtube.com/results?search_query=db+curtsy+lunge+dumbbell+exercise+tutorial' },
-    { name:'Bodyweight Split Squat', reps:'10 each side', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=bodyweight+split+squat+exercise+tutorial' }
+    { name:'Bodyweight Split Squat', reps:'10 each side', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=bodyweight+split+squat+exercise+tutorial' },
+    { name:'Mace Front-Loaded Squat', reps:'8-10 reps', equip:['mace'], video:'https://www.youtube.com/results?search_query=mace+front+loaded+squat+steel+mace+exercise+tutorial' }
   ],
   push: [
     { name:'DB Bench Press', reps:'8-10 reps', equip:['db','bench'], video:'https://www.youtube.com/results?search_query=db+bench+press+dumbbell+bench+exercise+tutorial' },
@@ -747,7 +750,8 @@ const MAIN_SET = {
     { name:'Barbell Bench Press', reps:'6-8 reps', equip:['barbell','bench'], video:'https://www.youtube.com/results?search_query=barbell+bench+press+barbell+bench+exercise+tutorial' },
     { name:'Landmine Press', reps:'8 each side', equip:['landmine'], video:'https://www.youtube.com/results?search_query=landmine+press+landmine+exercise+tutorial' },
     { name:'KB Push Press', reps:'6 each side', equip:['kb'], video:'https://www.youtube.com/results?search_query=kb+push+press+kettlebell+exercise+tutorial' },
-    { name:'Push-Up', reps:'10-15 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=push+up+exercise+tutorial' }
+    { name:'Push-Up', reps:'10-15 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=push+up+exercise+tutorial' },
+    { name:'Mace 2-Hand Overhead Press', reps:'8-10 reps', equip:['mace'], video:'https://www.youtube.com/results?search_query=mace+2+hand+overhead+press+steel+mace+exercise+tutorial' }
   ],
   pull: [
     { name:'Pull-Up / Chin-Up', reps:'5-8 reps', equip:['pullup'], video:'https://www.youtube.com/results?search_query=pull+up+chin+up+pull+up+bar+exercise+tutorial' },
@@ -758,7 +762,8 @@ const MAIN_SET = {
     { name:'TRX Row', reps:'10-12 reps', equip:['trx'], video:'https://www.youtube.com/results?search_query=trx+row+trx+exercise+tutorial' },
     { name:'Standing Cable Row', reps:'10-12 reps', equip:['cable'], video:'https://www.youtube.com/results?search_query=standing+cable+row+cable+machine+exercise+tutorial' },
     { name:'Towel Row (doorframe/table)', reps:'10-12 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=towel+row+doorframe+table+exercise+tutorial' },
-    { name:'Superman Row', reps:'12-15 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=superman+row+exercise+tutorial' }
+    { name:'Superman Row', reps:'12-15 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=superman+row+exercise+tutorial' },
+    { name:'Mace Back Scratcher', reps:'8 each side', equip:['mace'], video:'https://www.youtube.com/results?search_query=mace+back+scratcher+steel+mace+exercise+tutorial' }
   ],
   core: [
     { name:'Weighted Deadbug – Medicine Ball', reps:'12-16 reps', equip:['medball'], video:'https://www.youtube.com/results?search_query=weighted+deadbug+medicine+ball+medicine+ball+exercise+tutorial' },
@@ -767,7 +772,8 @@ const MAIN_SET = {
     { name:'Half-Kneeling Pallof Press – Band', reps:'8 each side', equip:['bands'], video:'https://www.youtube.com/results?search_query=half+kneeling+pallof+press+band+resistance+band+exercise+tutorial' },
     { name:'Cable Pallof Press', reps:'8 each side', equip:['cable'], video:'https://www.youtube.com/results?search_query=cable+pallof+press+cable+machine+exercise+tutorial' },
     { name:'Hanging Knee Raise', reps:'8-12 reps', equip:['pullup'], video:'https://www.youtube.com/results?search_query=hanging+knee+raise+pull+up+bar+exercise+tutorial' },
-    { name:'Side Plank', reps:'20-30 sec each side', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=side+plank+exercise+tutorial' }
+    { name:'Side Plank', reps:'20-30 sec each side', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=side+plank+exercise+tutorial' },
+    { name:'Mace Wood Chop (Side Rotation)', reps:'8 each side', equip:['mace'], video:'https://www.youtube.com/results?search_query=mace+wood+chop+side+rotation+steel+mace+exercise+tutorial' }
   ]
 };
 
@@ -782,7 +788,8 @@ const FINISHER = {
     { name:'Band Pull-Apart', reps:'15 reps', equip:['bands'], video:'https://www.youtube.com/results?search_query=band+pull+apart+resistance+band+exercise+tutorial' },
     { name:'Bench Dips', reps:'10-12 reps', equip:['bench'], video:'https://www.youtube.com/results?search_query=bench+dips+bench+exercise+tutorial' },
     { name:'Diamond Push-Up', reps:'8-12 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=diamond+push+up+exercise+tutorial' },
-    { name:'Chair / Floor Tricep Dip', reps:'10-12 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=chair+floor+tricep+dip+exercise+tutorial' }
+    { name:'Chair / Floor Tricep Dip', reps:'10-12 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=chair+floor+tricep+dip+exercise+tutorial' },
+    { name:'Mace 360 Swing', reps:'30-45 sec continuous', equip:['mace'], video:'https://www.youtube.com/results?search_query=mace+360+swing+steel+mace+exercise+tutorial' }
   ],
   core: [
     { name:'Sit-Up', reps:'12-15 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=sit+up+exercise+tutorial' },
@@ -792,7 +799,8 @@ const FINISHER = {
     { name:'Side Plank Dip – Kettlebell', reps:'8 each side', equip:['kb'], video:'https://www.youtube.com/results?search_query=side+plank+dip+kettlebell+kettlebell+exercise+tutorial' },
     { name:'Plank Hold', reps:'30-45 sec', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=plank+hold+exercise+tutorial' },
     { name:'Hollow Hold', reps:'20-30 sec', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=hollow+hold+exercise+tutorial' },
-    { name:'Reverse Crunch', reps:'12-15 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=reverse+crunch+exercise+tutorial' }
+    { name:'Reverse Crunch', reps:'12-15 reps', equip:['bodyweight'], video:'https://www.youtube.com/results?search_query=reverse+crunch+exercise+tutorial' },
+    { name:'Mace Gravedigger', reps:'10 each side', equip:['mace'], video:'https://www.youtube.com/results?search_query=mace+gravedigger+steel+mace+exercise+tutorial' }
   ]
 };
 
@@ -853,7 +861,7 @@ function wireLogInput(container, name) {
 const OPTIONAL_IDS = EQUIPMENT.filter(e => !e.always).map(e => e.id);
 
 const PRESETS = {
-  full: OPTIONAL_IDS,
+  full: EQUIPMENT.filter(e => !e.always && e.fullGym !== false).map(e => e.id),
   bodyweight: [],
   hotel: ['db','bench','bands']
 };
